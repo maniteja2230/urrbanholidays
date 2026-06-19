@@ -1,0 +1,132 @@
+{% load static %}
+<!-- ═══════════════════════════════════════════════════════════════════════
+     URBAN HOLIDAYS — Premium Footer
+═══════════════════════════════════════════════════════════════════════ -->
+<footer class="uh-footer">
+    <!-- Main Footer Content -->
+    <div class="footer-main">
+        <div class="container">
+            <div class="row g-5">
+                <!-- Brand Column -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-brand mb-4">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="footer-logo-icon">✈</div>
+                            <div>
+                                <h4 class="mb-0 fw-bold text-white">Urban<span class="text-warning">Holidays</span></h4>
+                                <small class="text-muted">Premium Travel Vouchers</small>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-4">
+                            Urban Holidays brings you exclusive Mega Ticket Gift Vouchers worth ₹{{ VOUCHER_PRICE }}.
+                            Explore India's finest destinations with our premium travel packages.
+                        </p>
+                        <!-- Social Links -->
+                        <div class="social-links d-flex gap-3">
+                            <a href="#" class="social-link" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="social-link" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="social-link" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                            <a href="#" class="social-link" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+                            <a href="#" class="social-link" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="footer-heading">Quick Links</h6>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'core:home' %}"><i class="bi bi-chevron-right"></i>Home</a></li>
+                        <li><a href="{% url 'core:about' %}"><i class="bi bi-chevron-right"></i>About Us</a></li>
+                        <li><a href="{% url 'packages:list' %}"><i class="bi bi-chevron-right"></i>Packages</a></li>
+                        <li><a href="{% url 'vouchers:buy' %}"><i class="bi bi-chevron-right"></i>Buy Voucher</a></li>
+                        <li><a href="{% url 'core:contact' %}"><i class="bi bi-chevron-right"></i>Contact</a></li>
+                        <li><a href="{% url 'core:faq' %}"><i class="bi bi-chevron-right"></i>FAQ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal Links -->
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="footer-heading">Legal</h6>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'core:terms' %}"><i class="bi bi-chevron-right"></i>Terms & Conditions</a></li>
+                        <li><a href="{% url 'core:privacy' %}"><i class="bi bi-chevron-right"></i>Privacy Policy</a></li>
+                        <li><a href="{% url 'core:faq' %}"><i class="bi bi-chevron-right"></i>Refund Policy</a></li>
+                    </ul>
+                    <h6 class="footer-heading mt-4">Account</h6>
+                    <ul class="footer-links">
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'dashboard:index' %}"><i class="bi bi-chevron-right"></i>Dashboard</a></li>
+                        <li><a href="{% url 'accounts:profile' %}"><i class="bi bi-chevron-right"></i>My Profile</a></li>
+                        {% else %}
+                        <li><a href="{% url 'accounts:login' %}"><i class="bi bi-chevron-right"></i>Login</a></li>
+                        <li><a href="{% url 'accounts:register' %}"><i class="bi bi-chevron-right"></i>Register</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="footer-heading">Get In Touch</h6>
+                    <div class="contact-items">
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                            <div>
+                                <strong>Address</strong><br>
+                                <span class="text-muted small">Urban Holidays Pvt. Ltd.<br>
+                                123 Travel Street, Business District<br>
+                                Hyderabad, Telangana – 500001</span>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="bi bi-telephone-fill"></i></div>
+                            <div>
+                                <strong>Phone</strong><br>
+                                <a href="tel:+919999999999" class="text-muted small text-decoration-none">+91 9999 999 999</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="bi bi-envelope-fill"></i></div>
+                            <div>
+                                <strong>Email</strong><br>
+                                <a href="mailto:support@urbanholidays.com" class="text-muted small text-decoration-none">support@urbanholidays.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="bi bi-clock-fill"></i></div>
+                            <div>
+                                <strong>Working Hours</strong><br>
+                                <span class="text-muted small">Mon–Sat: 9:00 AM – 6:00 PM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voucher CTA -->
+                    <a href="{% url 'vouchers:buy' %}" class="btn btn-warning mt-4 w-100 fw-semibold">
+                        <i class="bi bi-ticket-perforated me-2"></i>Buy Mega Voucher @ ₹{{ VOUCHER_PRICE }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted small">
+                        © {% now "Y" %} Urban Holidays Pvt. Ltd. All Rights Reserved.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                    <div class="payment-badges d-flex gap-2 justify-content-md-end flex-wrap">
+                        <span class="payment-badge"><i class="bi bi-shield-check me-1"></i>Secure Payments</span>
+                        <span class="payment-badge"><i class="bi bi-credit-card me-1"></i>Razorpay</span>
+                        <span class="payment-badge"><i class="bi bi-lock-fill me-1"></i>SSL Encrypted</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

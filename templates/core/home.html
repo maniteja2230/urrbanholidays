@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Urban Holidays – Premium Travel Vouchers & Packages{% endblock %}
+
+{% block content %}
+<!-- ═══ HERO SECTION ══════════════════════════════════════════════════════ -->
+<section class="hero-section" id="hero">
+    <div class="hero-bg-animation">
+        <div class="hero-particle" style="--x:10%;--y:20%;--size:300px;--delay:0s;"></div>
+        <div class="hero-particle" style="--x:70%;--y:60%;--size:200px;--delay:2s;"></div>
+        <div class="hero-particle" style="--x:40%;--y:80%;--size:150px;--delay:4s;"></div>
+    </div>
+
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-100 py-5">
+            <div class="col-lg-7" data-aos="fade-right">
+                <div class="hero-badge mb-3">
+                    <span class="badge-dot"></span>
+                    <span>🎉 Special Offer – Only ₹{{ voucher_price }}</span>
+                </div>
+                <h1 class="hero-title">
+                    Unlock <span class="gradient-text">Premium Travel</span><br>
+                    Experiences with<br>
+                    <span class="text-warning">Urban Holidays</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Buy your Mega Ticket Gift Voucher for just <strong>₹{{ voucher_price }}</strong> and unlock
+                    access to exclusive travel packages across India's most beautiful destinations.
+                    QR-coded, digital, downloadable.
+                </p>
+
+                <div class="hero-features d-flex flex-wrap gap-3 mb-5">
+                    <div class="hero-feature">
+                        <i class="bi bi-qr-code-scan"></i>
+                        <span>QR Code Enabled</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        <span>Downloadable PDF</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="bi bi-shield-check"></i>
+                        <span>100% Secure</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="bi bi-gift"></i>
+                        <span>Referral Rewards</span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'vouchers:buy' %}" class="btn btn-hero-primary">
+                        <i class="bi bi-ticket-perforated me-2"></i>Buy Voucher @ ₹{{ voucher_price }}
+                    </a>
+                    <a href="{% url 'packages:list' %}" class="btn btn-hero-outline">
+                        <i class="bi bi-map me-2"></i>Explore Packages
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero Voucher Card -->
+            <div class="col-lg-5 d-none d-lg-block" data-aos="fade-left" data-aos-delay="200">
+                <div class="voucher-preview-card">
+                    <div class="voucher-card-inner">
+                        <div class="vc-header">
+                            <div class="vc-logo">✈ URBAN HOLIDAYS</div>
+                            <div class="vc-tag">MEGA TICKET GIFT VOUCHER</div>
+                        </div>
+                        <div class="vc-amount">₹{{ voucher_price }}</div>
+                        <div class="vc-body">
+                            <div class="vc-info">
+                                <span class="vc-label">VALIDITY</span>
+                                <span class="vc-value">365 Days</span>
+                            </div>
+                            <div class="vc-qr">
+                                <div class="qr-placeholder">
+                                    <i class="bi bi-qr-code fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vc-coupon">
+                            <span class="vc-label">COUPON CODE</span>
+                            <span class="vc-code">URBAN-XXXXX</span>
+                        </div>
+                        <div class="vc-footer-strip"></div>
+                    </div>
+                    <div class="voucher-glow"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-dot"></div>
+    </div>
+</section>
+
+<!-- ═══ STATS SECTION ════════════════════════════════════════════════════ -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-bar" data-aos="fade-up">
+            <div class="stat-item">
+                <span class="stat-number">10,000+</span>
+                <span class="stat-label">Happy Customers</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number">50+</span>
+                <span class="stat-label">Destinations</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number">500+</span>
+                <span class="stat-label">Packages</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number">₹{{ voucher_price }}</span>
+                <span class="stat-label">Voucher Price</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ══════════════════════════════════════════════════════ -->
+<section class="section-padding bg-light" id="how-it-works">
+    <div class="container">
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <span class="section-badge">Simple Process</span>
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Get your travel voucher in 4 easy steps</p>
+        </div>
+        <div class="row g-4">
+            {% for step in "1234" %}
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}00">
+                <div class="step-card text-center">
+                    <div class="step-number">{{ forloop.counter }}</div>
+                    <div class="step-icon">
+                        {% if forloop.counter == 1 %}🛒
+                        {% elif forloop.counter == 2 %}💳
+                        {% elif forloop.counter == 3 %}🎟️
+                        {% else %}✈{% endif %}
+                    </div>
+                    <h5 class="step-title">
+                        {% if forloop.counter == 1 %}Choose Voucher
+                        {% elif forloop.counter == 2 %}Pay ₹{{ voucher_price }}
+                        {% elif forloop.counter == 3 %}Get Your Code
+                        {% else %}Travel & Enjoy{% endif %}
+                    </h5>
+                    <p class="step-desc text-muted small">
+                        {% if forloop.counter == 1 %}Select the Urban Holidays Mega Ticket Gift Voucher.
+                        {% elif forloop.counter == 2 %}Pay securely via Razorpay – UPI, cards, netbanking.
+                        {% elif forloop.counter == 3 %}Receive digital voucher with QR code instantly.
+                        {% else %}Submit redemption request and enjoy your trip!{% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ═══ FEATURED PACKAGES ════════════════════════════════════════════════ -->
+{% if featured_packages %}
+<section class="section-padding" id="packages">
+    <div class="container">
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <span class="section-badge">Travel India</span>
+            <h2 class="section-title">Featured Packages</h2>
+            <p class="section-subtitle">Handpicked destinations for unforgettable experiences</p>
+        </div>
+        <div class="row g-4">
+            {% for package in featured_packages %}
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}00">
+                <div class="package-card">
+                    <div class="package-img">
+                        {% if package.thumbnail %}
+                            <img src="{{ package.thumbnail.url }}" alt="{{ package.name }}">
+                        {% else %}
+                            <div class="package-img-placeholder">
+                                <i class="bi bi-image fs-1 text-white opacity-50"></i>
+                            </div>
+                        {% endif %}
+                        <div class="package-badge">{{ package.get_category_display }}</div>
+                        {% if package.is_voucher_applicable %}
+                        <div class="voucher-badge">
+                            <i class="bi bi-ticket-perforated me-1"></i>Voucher Valid
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="package-body">
+                        <h5 class="package-name">{{ package.name }}</h5>
+                        <div class="package-meta d-flex align-items-center gap-3 mb-2">
+                            <span><i class="bi bi-geo-alt text-primary me-1"></i>{{ package.destination.name|default:"India" }}</span>
+                            <span><i class="bi bi-moon text-primary me-1"></i>{{ package.duration_nights }}N/{{ package.duration_days }}D</span>
+                        </div>
+                        <div class="package-rating mb-3">
+                            {% for i in package.stars_range %}
+                                {% if i <= package.rating %}
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                {% else %}
+                                    <i class="bi bi-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="small text-muted ms-1">({{ package.review_count }})</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                {% if package.original_price %}
+                                    <span class="text-muted text-decoration-line-through small">₹{{ package.original_price|intcomma }}</span>
+                                {% endif %}
+                                <div class="package-price">₹{{ package.price|intcomma }}</div>
+                            </div>
+                            <a href="{% url 'packages:detail' package.slug %}" class="btn btn-primary btn-sm">
+                                View Details <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="{% url 'packages:list' %}" class="btn btn-outline-primary btn-lg px-5">
+                View All Packages <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ═══ VOUCHER HIGHLIGHT ════════════════════════════════════════════════ -->
+<section class="voucher-cta-section section-padding">
+    <div class="container">
+        <div class="voucher-cta-card" data-aos="zoom-in">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="cta-icon">🎟️</div>
+                        <div>
+                            <h2 class="fw-bold text-white mb-1">Get Your Mega Ticket Voucher</h2>
+                            <p class="text-white-50 mb-0">One voucher. Endless possibilities. Valid for 365 days.</p>
+                        </div>
+                    </div>
+                    <div class="cta-features d-flex flex-wrap gap-3 mt-4">
+                        <span class="cta-feature"><i class="bi bi-check-circle-fill me-2"></i>Digital QR Voucher</span>
+                        <span class="cta-feature"><i class="bi bi-check-circle-fill me-2"></i>Instant Delivery</span>
+                        <span class="cta-feature"><i class="bi bi-check-circle-fill me-2"></i>Redeemable Anytime</span>
+                        <span class="cta-feature"><i class="bi bi-check-circle-fill me-2"></i>PDF Download</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <div class="cta-price-tag">
+                        <div class="cta-price-label">Only</div>
+                        <div class="cta-price">₹{{ voucher_price }}</div>
+                        <div class="cta-price-label">per voucher</div>
+                    </div>
+                    <a href="{% url 'vouchers:buy' %}" class="btn btn-cta-buy btn-lg mt-3">
+                        <i class="bi bi-cart-plus me-2"></i>Buy Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ══════════════════════════════════════════════════════ -->
+{% if testimonials %}
+<section class="section-padding bg-light" id="testimonials">
+    <div class="container">
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <span class="section-badge">Customer Stories</span>
+            <h2 class="section-title">What Our Travellers Say</h2>
+        </div>
+        <div class="row g-4">
+            {% for testimonial in testimonials %}
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}00">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars mb-2">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= testimonial.rating %}
+                                <i class="bi bi-star-fill text-warning"></i>
+                            {% else %}
+                                <i class="bi bi-star text-muted"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <p class="testimonial-text">"{{ testimonial.message }}"</p>
+                    <div class="testimonial-author d-flex align-items-center gap-3 mt-3">
+                        <div class="author-avatar">{{ testimonial.name|first|upper }}</div>
+                        <div>
+                            <div class="fw-semibold">{{ testimonial.name }}</div>
+                            <div class="text-muted small">{{ testimonial.location }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ═══ FAQ PREVIEW ═══════════════════════════════════════════════════════ -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row align-items-start">
+            <div class="col-lg-4 mb-4 mb-lg-0" data-aos="fade-right">
+                <span class="section-badge">FAQ</span>
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="text-muted">Have questions about our vouchers? We've got answers.</p>
+                <a href="{% url 'core:faq' %}" class="btn btn-outline-primary mt-3">
+                    View All FAQs <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+            <div class="col-lg-8" data-aos="fade-left">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item border-0 mb-2">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                What is the Urban Holidays Mega Ticket Voucher?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted">
+                                The Urban Holidays Mega Ticket Gift Voucher is a ₹{{ voucher_price }} digital voucher that gives you access to exclusive travel packages and deals offered by Urban Holidays.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0 mb-2">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                How do I redeem my voucher?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted">
+                                After purchase, go to your Dashboard → My Vouchers → Click on your voucher → Submit Redemption Request. Our team will process it within 24–48 hours.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0 mb-2">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                Can I earn rewards by referring friends?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted">
+                                Yes! Share your unique referral code with friends. When they register using your code, you earn ₹{{ REFERRAL_BONUS }} as a wallet bonus!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                How long is the voucher valid?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted">
+                                Each voucher is valid for 365 days from the date of purchase. You can track the expiry date in your dashboard.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

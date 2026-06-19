@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Transaction History – Urban Holidays{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-layout { display: flex; min-height: calc(100vh - 80px); padding-top: 80px; }
+.sidebar { width: 260px; min-width: 260px; background: linear-gradient(180deg, #0A2463 0%, #0D2F7A 100%); color: white; padding: 30px 0; position: sticky; top: 80px; height: calc(100vh - 80px); overflow-y: auto; }
+.sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 25px; color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.9rem; transition: all 0.2s; }
+.sidebar-nav a:hover, .sidebar-nav a.active { background: rgba(255,255,255,0.12); color: white; border-right: 3px solid #FFD700; }
+.sidebar-nav a i { width: 20px; }
+.dashboard-content { flex: 1; background: #f0f4ff; padding: 30px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <div class="sidebar">
+        <div class="text-center py-3 border-bottom" style="border-color:rgba(255,255,255,0.1) !important;">
+            <div class="fw-bold text-white">✈ Urban Holidays</div>
+        </div>
+        <nav class="sidebar-nav mt-3">
+            <a href="{% url 'dashboard:index' %}"><i class="bi bi-speedometer2"></i>Dashboard</a>
+            <a href="{% url 'dashboard:my_vouchers' %}"><i class="bi bi-ticket-perforated"></i>My Vouchers</a>
+            <a href="{% url 'packages:list' %}"><i class="bi bi-map"></i>Packages</a>
+            <a href="{% url 'accounts:profile' %}"><i class="bi bi-person-gear"></i>Profile</a>
+            <a href="{% url 'dashboard:transactions' %}" class="active"><i class="bi bi-clock-history"></i>Transactions</a>
+            <a href="{% url 'dashboard:referrals' %}"><i class="bi bi-people"></i>Referrals</a>
+            <a href="{% url 'notifications:list' %}"><i class="bi bi-bell"></i>Notifications</a>
+        </nav>
+    </div>
+
+    <div class="dashboard-content">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h4 class="fw-bold mb-0" style="color:#0A2463">Transaction History</h4>
+            <div class="badge bg-primary fs-6">Total Spent: ₹{{ total_spent }}</div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4" data-aos="fade-up">
+            <div class="card-body p-0">
+                {% if transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Order ID</th>
+                                <th>Payment ID</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Voucher</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for txn in transactions %}
+                            <tr>
+                                <td class="ps-4">
+                                    <code class="small text-truncate d-block" style="max-width:140px;" title="{{ txn.razorpay_order_id }}">
+                                        {{ txn.razorpay_order_id|truncatechars:18 }}
+                                    </code>
+                                </td>
+                                <td>
+                                    <code class="small text-muted">
+                                        {{ txn.razorpay_payment_id|truncatechars:18|default:"—" }}
+                                    </code>
+                                </td>
+                                <td><strong>₹{{ txn.amount }}</strong></td>
+                                <td>{{ txn.payment_method|title|default:"—" }}</td>
+                                <td>
+                                    <span class="badge {% if txn.status == 'paid' %}bg-success{% elif txn.status == 'failed' %}bg-danger{% elif txn.status == 'created' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                        {{ txn.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="text-muted small">{{ txn.created_at|date:"d M Y, h:i A" }}</td>
+                                <td>
+                                    {% if txn.voucher %}
+                                        <a href="{% url 'vouchers:detail' txn.voucher.voucher_number %}" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-ticket-perforated me-1"></i>View
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted small">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-receipt fs-1 d-block mb-3"></i>
+                    <h5>No transactions yet</h5>
+                    <p>Buy your first voucher to see transactions here.</p>
+                    <a href="{% url 'vouchers:buy' %}" class="btn btn-primary">Buy Voucher</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

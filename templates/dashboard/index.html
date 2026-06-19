@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard – Urban Holidays{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-layout { display: flex; min-height: calc(100vh - 80px); padding-top: 80px; }
+.sidebar {
+    width: 260px; min-width: 260px;
+    background: linear-gradient(180deg, #0A2463 0%, #0D2F7A 100%);
+    color: white;
+    padding: 30px 0;
+    position: sticky; top: 80px; height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+.sidebar-user {
+    text-align: center;
+    padding: 0 20px 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 20px;
+}
+.sidebar-avatar {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; color: white;
+    border: 3px solid rgba(255,215,0,0.5);
+    margin: 0 auto 12px;
+    font-weight: 700;
+    overflow: hidden;
+}
+.sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sidebar-nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 25px;
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+    background: rgba(255,255,255,0.12);
+    color: white;
+    border-right: 3px solid #FFD700;
+}
+.sidebar-nav a i { width: 20px; font-size: 1.1rem; }
+.sidebar-nav .nav-group { padding: 10px 25px 5px; font-size: 0.7rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
+.dashboard-content { flex: 1; background: #f0f4ff; padding: 30px; overflow-y: auto; }
+.dash-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+    border: none;
+    transition: transform 0.2s;
+}
+.dash-card:hover { transform: translateY(-3px); }
+.stat-card-dash {
+    background: linear-gradient(135deg, #0A2463, #1E90FF);
+    color: white;
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+}
+.stat-card-dash::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+}
+.stat-card-dash .stat-icon { font-size: 2rem; opacity: 0.8; }
+.stat-card-dash .stat-value { font-size: 2.2rem; font-weight: 800; }
+.stat-card-dash .stat-name { font-size: 0.82rem; opacity: 0.8; }
+@media (max-width: 768px) {
+    .sidebar { display: none; }
+    .dashboard-content { padding: 20px 15px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">
+                {% if profile.profile_photo %}
+                    <img src="{{ profile.profile_photo.url }}" alt="Avatar">
+                {% else %}
+                    {{ request.user.first_name|first|default:request.user.username|first|upper }}
+                {% endif %}
+            </div>
+            <div class="fw-bold">{{ request.user.first_name|default:request.user.username }}</div>
+            <div style="font-size:0.75rem;opacity:0.6;">{{ request.user.email }}</div>
+            <div class="mt-2">
+                <span class="badge" style="background:rgba(255,215,0,0.2);color:#FFD700;border:1px solid rgba(255,215,0,0.3);">
+                    <i class="bi bi-wallet2 me-1"></i>₹{{ wallet_balance }}
+                </span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group">Main</div>
+            <a href="{% url 'dashboard:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                <i class="bi bi-speedometer2"></i>Dashboard
+            </a>
+            <a href="{% url 'dashboard:my_vouchers' %}" class="{% if request.resolver_match.url_name == 'my_vouchers' %}active{% endif %}">
+                <i class="bi bi-ticket-perforated"></i>My Vouchers
+                <span class="ms-auto badge bg-primary">{{ active_vouchers }}</span>
+            </a>
+            <a href="{% url 'packages:list' %}">
+                <i class="bi bi-map"></i>Travel Packages
+            </a>
+
+            <div class="nav-group">Account</div>
+            <a href="{% url 'accounts:profile' %}">
+                <i class="bi bi-person-gear"></i>Profile
+            </a>
+            <a href="{% url 'dashboard:transactions' %}" class="{% if request.resolver_match.url_name == 'transactions' %}active{% endif %}">
+                <i class="bi bi-clock-history"></i>Transactions
+            </a>
+            <a href="{% url 'dashboard:referrals' %}" class="{% if request.resolver_match.url_name == 'referrals' %}active{% endif %}">
+                <i class="bi bi-people"></i>Referrals
+                <span class="ms-auto badge bg-warning text-dark">{{ total_referrals }}</span>
+            </a>
+            <a href="{% url 'notifications:list' %}">
+                <i class="bi bi-bell"></i>Notifications
+                {% if unread_notifications > 0 %}
+                    <span class="ms-auto badge bg-danger">{{ unread_notifications }}</span>
+                {% endif %}
+            </a>
+
+            <div class="nav-group">Quick Actions</div>
+            <a href="{% url 'vouchers:buy' %}">
+                <i class="bi bi-cart-plus"></i>Buy Voucher
+            </a>
+            <a href="{% url 'core:contact' %}">
+                <i class="bi bi-headset"></i>Support
+            </a>
+            <a href="{% url 'accounts:logout' %}" class="text-danger-soft">
+                <i class="bi bi-box-arrow-right"></i>Sign Out
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <!-- Welcome Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h4 class="fw-bold mb-1" style="color:#0A2463">
+                    Welcome back, {{ request.user.first_name|default:request.user.username }}! 👋
+                </h4>
+                <p class="text-muted mb-0 small">Here's your travel dashboard overview.</p>
+            </div>
+            <a href="{% url 'vouchers:buy' %}" class="btn btn-primary d-none d-md-inline-flex">
+                <i class="bi bi-plus-circle me-2"></i>Buy Voucher
+            </a>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card-dash">
+                    <div class="stat-icon mb-2">🎟️</div>
+                    <div class="stat-value">{{ total_vouchers }}</div>
+                    <div class="stat-name">Total Vouchers</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card-dash" style="background:linear-gradient(135deg,#28A745,#20C997);">
+                    <div class="stat-icon mb-2">✅</div>
+                    <div class="stat-value">{{ active_vouchers }}</div>
+                    <div class="stat-name">Active Vouchers</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card-dash" style="background:linear-gradient(135deg,#FF9500,#FF5722);">
+                    <div class="stat-icon mb-2">⏳</div>
+                    <div class="stat-value">{{ pending_redemptions }}</div>
+                    <div class="stat-name">Pending Requests</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card-dash" style="background:linear-gradient(135deg,#6C3483,#9B59B6);">
+                    <div class="stat-icon mb-2">💰</div>
+                    <div class="stat-value">₹{{ wallet_balance }}</div>
+                    <div class="stat-name">Wallet Balance</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Recent Transactions -->
+            <div class="col-lg-7">
+                <div class="dash-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0" style="color:#0A2463">Recent Transactions</h6>
+                        <a href="{% url 'dashboard:transactions' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                    </div>
+                    {% if recent_transactions %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle small">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for txn in recent_transactions %}
+                                    <tr>
+                                        <td class="fw-semibold text-truncate" style="max-width:120px;" title="{{ txn.razorpay_order_id }}">
+                                            {{ txn.razorpay_order_id|truncatechars:16 }}
+                                        </td>
+                                        <td class="fw-bold">₹{{ txn.amount }}</td>
+                                        <td>
+                                            <span class="badge {% if txn.status == 'paid' %}bg-success{% elif txn.status == 'failed' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                                {{ txn.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td class="text-muted">{{ txn.created_at|date:"d M Y" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-receipt fs-2 d-block mb-2"></i>No transactions yet.
+                            <div class="mt-2"><a href="{% url 'vouchers:buy' %}" class="btn btn-primary btn-sm">Buy Your First Voucher</a></div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Notifications & Referral -->
+            <div class="col-lg-5">
+                <div class="dash-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0" style="color:#0A2463">Notifications</h6>
+                        <a href="{% url 'notifications:list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                    </div>
+                    {% if recent_notifications %}
+                        {% for notif in recent_notifications %}
+                        <div class="d-flex gap-3 py-2 border-bottom">
+                            <span class="fs-5">{{ notif.icon }}</span>
+                            <div>
+                                <div class="fw-semibold small">{{ notif.title }}</div>
+                                <div class="text-muted small">{{ notif.message|truncatewords:12 }}</div>
+                                <div class="text-muted" style="font-size:0.7rem;">{{ notif.created_at|timesince }} ago</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="bi bi-bell-slash fs-3 d-block mb-2"></i>No notifications yet.
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Referral Card -->
+                <div class="dash-card" style="background:linear-gradient(135deg,#0A2463,#1E90FF);color:white;">
+                    <h6 class="fw-bold mb-3">🎁 Referral Program</h6>
+                    <div class="mb-3">
+                        <div class="small opacity-75 mb-1">Your Referral Code</div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="fw-bold" style="font-size:1.3rem;letter-spacing:4px;font-family:monospace;color:#FFD700;">
+                                {{ profile.referral_code }}
+                            </div>
+                            <button class="btn btn-sm" style="background:rgba(255,255,255,0.15);color:white;"
+                                    onclick="navigator.clipboard.writeText('{{ profile.referral_code }}').then(()=>alert('Copied!'))">
+                                <i class="bi bi-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between small mb-3">
+                        <div>
+                            <div class="opacity-75">Total Referrals</div>
+                            <div class="fw-bold fs-5">{{ total_referrals }}</div>
+                        </div>
+                        <div>
+                            <div class="opacity-75">Total Earned</div>
+                            <div class="fw-bold fs-5">₹{{ referral_earnings }}</div>
+                        </div>
+                    </div>
+                    <a href="{% url 'dashboard:referrals' %}" class="btn btn-warning btn-sm w-100 fw-semibold">
+                        View Referrals <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

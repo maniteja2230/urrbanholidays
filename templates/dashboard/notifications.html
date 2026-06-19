@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications – Urban Holidays{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-layout { display: flex; min-height: calc(100vh - 80px); padding-top: 80px; }
+.sidebar { width: 260px; min-width: 260px; background: linear-gradient(180deg, #0A2463 0%, #0D2F7A 100%); color: white; padding: 30px 0; position: sticky; top: 80px; height: calc(100vh - 80px); overflow-y: auto; }
+.sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 25px; color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.9rem; transition: all 0.2s; }
+.sidebar-nav a:hover, .sidebar-nav a.active { background: rgba(255,255,255,0.12); color: white; border-right: 3px solid #FFD700; }
+.sidebar-nav a i { width: 20px; }
+.dashboard-content { flex: 1; background: #f0f4ff; padding: 30px; }
+.notif-item { background: white; border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: flex; gap: 16px; transition: all 0.2s; border-left: 4px solid #E0EAFF; }
+.notif-item.unread { border-left-color: #1E90FF; background: #f0f7ff; }
+.notif-icon { font-size: 1.5rem; min-width: 36px; text-align: center; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <div class="sidebar">
+        <div class="text-center py-3" style="border-bottom:1px solid rgba(255,255,255,0.1);">
+            <div class="fw-bold text-white">✈ Urban Holidays</div>
+        </div>
+        <nav class="sidebar-nav mt-3">
+            <a href="{% url 'dashboard:index' %}"><i class="bi bi-speedometer2"></i>Dashboard</a>
+            <a href="{% url 'dashboard:my_vouchers' %}"><i class="bi bi-ticket-perforated"></i>My Vouchers</a>
+            <a href="{% url 'accounts:profile' %}"><i class="bi bi-person-gear"></i>Profile</a>
+            <a href="{% url 'dashboard:transactions' %}"><i class="bi bi-clock-history"></i>Transactions</a>
+            <a href="{% url 'dashboard:referrals' %}"><i class="bi bi-people"></i>Referrals</a>
+            <a href="{% url 'notifications:list' %}" class="active"><i class="bi bi-bell"></i>Notifications</a>
+        </nav>
+    </div>
+
+    <div class="dashboard-content">
+        <h4 class="fw-bold mb-4" style="color:#0A2463">
+            <i class="bi bi-bell me-2"></i>Notifications
+        </h4>
+
+        {% if notifications %}
+            {% for notif in notifications %}
+            <div class="notif-item {% if not notif.is_read %}unread{% endif %}" data-aos="fade-up">
+                <div class="notif-icon">{{ notif.icon }}</div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="fw-semibold">{{ notif.title }}</div>
+                        <div class="d-flex align-items-center gap-2">
+                            {% if not notif.is_read %}
+                                <span class="badge bg-primary" style="font-size:0.65rem;">New</span>
+                            {% endif %}
+                            <small class="text-muted">{{ notif.created_at|timesince }} ago</small>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-1">{{ notif.message }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5 text-muted" data-aos="fade-up">
+                <i class="bi bi-bell-slash fs-1 d-block mb-3"></i>
+                <h5>No notifications</h5>
+                <p>You're all caught up! Notifications about your vouchers and redemptions will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

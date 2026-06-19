@@ -1,0 +1,458 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Get Voucher – Urban Holidays{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Page wrapper ──────────────────────────────────────────────── */
+.get-voucher-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0A2463 0%, #1565C0 60%, #1E90FF 100%);
+  padding-top: 80px;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Glassy card ────────────────────────────────────────────────── */
+.voucher-card {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+}
+
+/* ── Left: voucher preview ──────────────────────────────────────── */
+.voucher-preview {
+  background: linear-gradient(160deg, #0A1A4A 0%, #0D2F7A 100%);
+  padding: 48px 40px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.voucher-preview::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.voucher-preview::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; left: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(30,144,255,0.08);
+}
+.brand-title { font-size: 1.6rem; font-weight: 800; letter-spacing: 1px; }
+.brand-sub   { font-size: 0.7rem; opacity: .6; text-transform: uppercase; letter-spacing: 2px; }
+.price-tag {
+  background: rgba(255,215,0,0.12);
+  border: 2px solid rgba(255,215,0,0.45);
+  border-radius: 16px;
+  padding: 20px 30px;
+  text-align: center;
+  margin: 32px 0;
+}
+.price-tag .label { font-size: 0.72rem; opacity: .7; text-transform: uppercase; letter-spacing: 2px; }
+.price-tag .amount { font-size: 3.8rem; font-weight: 900; color: #FFD700; line-height: 1; }
+.feature-list { list-style: none; padding: 0; margin: 0; }
+.feature-list li {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  font-size: 0.9rem;
+  color: rgba(255,255,255,.85);
+}
+.feature-list li:last-child { border-bottom: none; }
+.feature-list .icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(255,215,0,0.15);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+.promo-strip {
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  border-radius: 10px;
+  padding: 12px 20px;
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 28px;
+  color: #0A2463; font-weight: 700; font-size: 0.85rem;
+}
+
+/* ── Right: payment panel ───────────────────────────────────────── */
+.payment-panel {
+  background: white;
+  padding: 48px 44px;
+}
+.step-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(10,36,99,0.06);
+  color: #0A2463;
+  border-radius: 50px;
+  padding: 6px 16px;
+  font-size: 0.78rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+.panel-title { font-size: 1.7rem; font-weight: 800; color: #0A2463; margin-bottom: 6px; }
+.panel-sub { color: #6c757d; font-size: 0.92rem; margin-bottom: 32px; }
+
+/* ── Summary box ───────────────────────────────────────────────── */
+.order-summary {
+  background: #f4f7ff;
+  border: 1px solid #dde8ff;
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 28px;
+}
+.summary-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #e0eaff;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-total { font-size: 1.2rem; font-weight: 800; color: #0A2463; }
+
+/* ── User info fields ──────────────────────────────────────────── */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+.info-field label { font-size: 0.78rem; font-weight: 600; color: #0A2463; margin-bottom: 5px; display: block; }
+.info-field input {
+  width: 100%;
+  border: 1.5px solid #dde8ff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  background: #f9fbff;
+  color: #333;
+  transition: border-color 0.2s;
+}
+.info-field input:focus { outline: none; border-color: #1E90FF; background: white; }
+.info-field.full { grid-column: span 2; }
+
+/* ── Pay button ────────────────────────────────────────────────── */
+.pay-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #0A2463;
+  border: none;
+  border-radius: 14px;
+  padding: 18px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: all 0.3s;
+  box-shadow: 0 8px 24px rgba(255,165,0,0.3);
+}
+.pay-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(255,165,0,0.45);
+}
+.pay-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.pay-btn .spinner {
+  width: 20px; height: 20px;
+  border: 3px solid rgba(10,36,99,0.3);
+  border-top-color: #0A2463;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: none;
+}
+.pay-btn.loading .spinner { display: block; }
+.pay-btn.loading .btn-text { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Trust badges ──────────────────────────────────────────────── */
+.trust-row {
+  display: flex; justify-content: center; gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.trust-badge {
+  display: flex; align-items: center; gap: 6px;
+  color: #6c757d; font-size: 0.78rem;
+}
+.trust-badge i { color: #1E90FF; }
+
+/* ── Error banner ──────────────────────────────────────────────── */
+.error-banner {
+  background: #fff3cd; border: 1px solid #ffc107;
+  border-radius: 12px; padding: 14px 18px;
+  color: #664d03; font-size: 0.88rem;
+  margin-bottom: 20px; display: flex; gap: 10px; align-items: flex-start;
+}
+
+@media (max-width: 767px) {
+  .info-grid { grid-template-columns: 1fr; }
+  .info-field.full { grid-column: span 1; }
+  .payment-panel, .voucher-preview { padding: 32px 24px; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<section class="get-voucher-page">
+  <div class="container py-5">
+    <div class="voucher-card">
+      <div class="row g-0">
+
+        <!-- ═══ LEFT – Voucher Preview ══════════════════════════════ -->
+        <div class="col-lg-5 voucher-preview">
+          <div class="position-relative" style="z-index:1;">
+
+            <!-- Brand -->
+            <div class="d-flex align-items-center gap-3 mb-4">
+              <div style="width:50px;height:50px;background:rgba(255,215,0,0.15);border:2px solid rgba(255,215,0,0.4);
+                          border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">✈</div>
+              <div>
+                <div class="brand-title">Urban<span style="color:#FFD700;">Holidays</span></div>
+                <div class="brand-sub">Premium Travel Vouchers</div>
+              </div>
+            </div>
+
+            <!-- Voucher type label -->
+            <div style="display:inline-block;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+                        border-radius:50px;padding:5px 16px;font-size:0.72rem;color:rgba(255,255,255,0.8);
+                        text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">
+              🎟 Mega Ticket Gift Voucher
+            </div>
+
+            <!-- Price tag -->
+            <div class="price-tag">
+              <div class="label">One-Time Payment</div>
+              <div class="amount">₹{{ amount }}</div>
+              <div style="color:rgba(255,215,0,0.7);font-size:0.78rem;margin-top:4px;">Valid for 365 Days</div>
+            </div>
+
+            <!-- Features -->
+            <ul class="feature-list">
+              <li><div class="icon">🔑</div>Unique Coupon Code</li>
+              <li><div class="icon">📱</div>QR Code Enabled</li>
+              <li><div class="icon">📄</div>Downloadable PDF Voucher</li>
+              <li><div class="icon">✈</div>Redeemable for Travel Packages</li>
+              <li><div class="icon">🎁</div>Earn ₹{{ REFERRAL_BONUS }} Referral Bonus</li>
+            </ul>
+
+            <!-- Promo strip -->
+            <div class="promo-strip">
+              <span style="font-size:1.3rem;">🔒</span>
+              <span>100% Secure · Instant Delivery · Refundable</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ═══ RIGHT – Payment Panel ═══════════════════════════════ -->
+        <div class="col-lg-7 payment-panel">
+
+          <div class="step-tag">
+            <i class="bi bi-1-circle-fill"></i>
+            Step 1 of 1 – Complete Payment
+          </div>
+          <h2 class="panel-title">Get Your Voucher</h2>
+          <p class="panel-sub">
+            Pay securely via Razorpay — UPI, Cards, Netbanking &amp; Wallets accepted.
+            Voucher delivered instantly to your account.
+          </p>
+
+          {% if error %}
+          <div class="error-banner">
+            <i class="bi bi-exclamation-triangle-fill" style="margin-top:2px;"></i>
+            <div>
+              <strong>Payment setup failed.</strong><br>
+              {{ error }}<br>
+              <a href="{% url 'vouchers:buy' %}" style="color:#0A2463;font-weight:600;">🔄 Try again</a>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Order Summary -->
+          <div class="order-summary">
+            <div class="summary-row">
+              <span class="text-muted">Item</span>
+              <span class="fw-semibold">Mega Ticket Gift Voucher</span>
+            </div>
+            <div class="summary-row">
+              <span class="text-muted">Validity</span>
+              <span>365 Days</span>
+            </div>
+            <div class="summary-row">
+              <span class="text-muted">Processing Fee</span>
+              <span class="text-success fw-semibold">FREE</span>
+            </div>
+            <div class="summary-row" style="border-bottom:none;padding-top:14px;border-top:2px solid #dde8ff;">
+              <span class="fw-bold" style="color:#0A2463;">Total Payable</span>
+              <span class="summary-total">₹{{ amount }}</span>
+            </div>
+          </div>
+
+          <!-- User Info -->
+          <div class="info-grid">
+            <div class="info-field full">
+              <label>Full Name</label>
+              <input type="text" id="userName" value="{{ user_name }}" readonly>
+            </div>
+            <div class="info-field">
+              <label>Email Address</label>
+              <input type="email" id="userEmail" value="{{ user_email }}" readonly>
+            </div>
+            <div class="info-field">
+              <label>Mobile Number <span style="color:red;">*</span></label>
+              <input type="tel" id="userPhone" value="{{ user_phone }}"
+                     placeholder="10-digit number" maxlength="10">
+            </div>
+          </div>
+
+          {% if not error %}
+          <!-- Pay Button -->
+          <button class="pay-btn" id="payBtn" onclick="startPayment()">
+            <div class="spinner" id="btnSpinner"></div>
+            <div class="btn-text">
+              <i class="bi bi-lock-fill me-2"></i>
+              Pay ₹{{ amount }} &amp; Get Voucher Instantly
+            </div>
+          </button>
+          {% else %}
+          <a href="{% url 'vouchers:buy' %}" class="pay-btn" style="text-decoration:none;">
+            <i class="bi bi-arrow-clockwise me-2"></i>Retry Payment
+          </a>
+          {% endif %}
+
+          <!-- Trust badges -->
+          <div class="trust-row">
+            <div class="trust-badge"><i class="bi bi-shield-fill-check"></i>256-bit SSL</div>
+            <div class="trust-badge"><i class="bi bi-credit-card-fill"></i>Razorpay Secured</div>
+            <div class="trust-badge"><i class="bi bi-patch-check-fill"></i>PCI DSS Compliant</div>
+            <div class="trust-badge"><i class="bi bi-arrow-return-left"></i>Refundable</div>
+          </div>
+
+        </div><!-- /payment-panel -->
+      </div><!-- /row -->
+    </div><!-- /voucher-card -->
+  </div><!-- /container -->
+</section>
+{% endblock %}
+
+
+{% block extra_js %}
+<!-- Razorpay Checkout SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+// ── Values injected from Django view ──────────────────────────────
+const RZP_KEY      = "{{ razorpay_key }}";
+const RZP_ORDER_ID = "{{ razorpay_order_id }}";
+const AMOUNT_PAISE = {{ amount_paise }};   // already in paise
+const USER_NAME    = "{{ user_name }}";
+const USER_EMAIL   = "{{ user_email }}";
+
+// ── Get CSRF token ─────────────────────────────────────────────────
+function getCookie(name) {
+  for (const part of document.cookie.split(';')) {
+    const [k, v] = part.trim().split('=');
+    if (k === name) return decodeURIComponent(v);
+  }
+  return '';
+}
+
+// ── Button helpers ─────────────────────────────────────────────────
+function setLoading(on) {
+  const btn = document.getElementById('payBtn');
+  btn.disabled = on;
+  btn.classList.toggle('loading', on);
+}
+
+// ── Main payment trigger ───────────────────────────────────────────
+function startPayment() {
+  const phone = document.getElementById('userPhone').value.trim();
+
+  if (!phone || phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+    document.getElementById('userPhone').style.borderColor = 'red';
+    document.getElementById('userPhone').focus();
+    alert('⚠️ Please enter a valid 10-digit mobile number to proceed.');
+    return;
+  }
+  document.getElementById('userPhone').style.borderColor = '';
+
+  if (!RZP_ORDER_ID) {
+    alert('Payment order not found. Please refresh the page and try again.');
+    return;
+  }
+
+  setLoading(true);
+
+  const options = {
+    key:         RZP_KEY,
+    amount:      AMOUNT_PAISE,      // paise
+    currency:    'INR',
+    name:        'Urban Holidays',
+    description: 'Mega Ticket Gift Voucher – ₹{{ amount }}',
+    order_id:    RZP_ORDER_ID,
+    prefill: {
+      name:    USER_NAME,
+      email:   USER_EMAIL,
+      contact: phone,
+    },
+    theme:  { color: '#0A2463' },
+    modal: {
+      backdropclose: false,
+      ondismiss: function () {
+        setLoading(false);
+      }
+    },
+    // ── Success handler ──────────────────────────────────────────
+    handler: function (response) {
+      // Show verifying state
+      const btn = document.getElementById('payBtn');
+      btn.querySelector('.btn-text').innerHTML =
+        '<i class="bi bi-hourglass-split me-2"></i>Verifying payment…';
+
+      // Send to backend for signature verification + voucher creation
+      fetch('/payments/callback/', {
+        method:  'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken':  getCookie('csrftoken'),
+        },
+        body: JSON.stringify({
+          razorpay_order_id:   response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature:  response.razorpay_signature,
+        }),
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'success') {
+          // Redirect to voucher success page
+          window.location.href = data.redirect_url;
+        } else {
+          alert('❌ Payment verification failed: ' + (data.message || 'Unknown error'));
+          setLoading(false);
+        }
+      })
+      .catch(err => {
+        console.error('Verification error:', err);
+        alert('⚠️ Network error during verification. Please contact support with order ID: ' + RZP_ORDER_ID);
+        setLoading(false);
+      });
+    },
+  };
+
+  // Open Razorpay checkout
+  const rzp = new Razorpay(options);
+  rzp.on('payment.failed', function (resp) {
+    alert('❌ Payment failed: ' + resp.error.description);
+    setLoading(false);
+  });
+  rzp.open();
+}
+</script>
+{% endblock %}

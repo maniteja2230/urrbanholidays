@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Account – Urban Holidays{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-section {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0A2463 0%, #1E90FF 50%, #0A2463 100%);
+    display: flex;
+    align-items: center;
+    padding: 60px 0;
+}
+.auth-card {
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 20px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+.auth-brand {
+    background: linear-gradient(135deg, #0A2463, #1E90FF);
+    padding: 40px 30px;
+    text-align: center;
+    color: white;
+}
+.auth-brand .logo-circle {
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 36px;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+.auth-body { padding: 40px 35px; }
+.form-floating label { color: #666; font-size: 0.9rem; }
+.form-control:focus { border-color: #1E90FF; box-shadow: 0 0 0 0.2rem rgba(30,144,255,0.25); }
+.btn-register {
+    background: linear-gradient(135deg, #0A2463, #1E90FF);
+    border: none;
+    color: white;
+    padding: 14px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+.btn-register:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(30,144,255,0.4); color: white; }
+.divider { display: flex; align-items: center; gap: 15px; margin: 20px 0; }
+.divider span { flex: 1; height: 1px; background: #e0e0e0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="auth-card">
+                    <div class="row g-0">
+                        <!-- Brand Side -->
+                        <div class="col-md-4 auth-brand d-flex flex-column justify-content-center">
+                            <div class="logo-circle">✈</div>
+                            <h3 class="fw-bold mb-2">Urban Holidays</h3>
+                            <p class="mb-4 opacity-75 small">Your gateway to extraordinary travel experiences</p>
+                            <div class="benefits mt-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="me-3 fs-5">🎟️</span>
+                                    <span class="small">Buy ₹149 Mega Voucher</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="me-3 fs-5">🎁</span>
+                                    <span class="small">Earn referral rewards</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="me-3 fs-5">🌴</span>
+                                    <span class="small">Access exclusive packages</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="me-3 fs-5">📱</span>
+                                    <span class="small">Digital wallet & QR codes</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Side -->
+                        <div class="col-md-8 auth-body">
+                            <h4 class="fw-bold mb-1" style="color:#0A2463">Create Your Account</h4>
+                            <p class="text-muted mb-4">Join thousands of happy travellers</p>
+
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                        {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+
+                            <form method="post" novalidate>
+                                {% csrf_token %}
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">First Name *</label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Last Name *</label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Username *</label>
+                                        {{ form.username }}
+                                        {% if form.username.errors %}
+                                            <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Mobile Number *</label>
+                                        {{ form.phone }}
+                                        {% if form.phone.errors %}
+                                            <div class="text-danger small">{{ form.phone.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Email Address *</label>
+                                        {{ form.email }}
+                                        {% if form.email.errors %}
+                                            <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Password *</label>
+                                        {{ form.password1 }}
+                                        {% if form.password1.errors %}
+                                            <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Confirm Password *</label>
+                                        {{ form.password2 }}
+                                        {% if form.password2.errors %}
+                                            <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Referral Code <span class="text-success">(Optional – Earn ₹{{ REFERRAL_BONUS }} bonus)</span></label>
+                                        {{ form.referral_code }}
+                                        {% if form.referral_code.errors %}
+                                            <div class="text-danger small">{{ form.referral_code.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-register w-100">
+                                        <i class="bi bi-person-plus-fill me-2"></i>Create Account
+                                    </button>
+                                </div>
+
+                                <div class="divider">
+                                    <span></span>
+                                    <small class="text-muted">Already have an account?</small>
+                                    <span></span>
+                                </div>
+
+                                <div class="text-center">
+                                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary w-100">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                                    </a>
+                                </div>
+
+                                <p class="text-center text-muted small mt-3">
+                                    By registering, you agree to our
+                                    <a href="{% url 'core:terms' %}">Terms & Conditions</a>
+                                    and <a href="{% url 'core:privacy' %}">Privacy Policy</a>
+                                </p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

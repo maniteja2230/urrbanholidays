@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Redeem Voucher – Urban Holidays{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+    <div class="container text-center">
+        <h1 class="page-hero-title">Redeem Your Voucher</h1>
+        <p class="page-hero-subtitle">{{ voucher.voucher_number }}</p>
+    </div>
+</div>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Voucher Badge -->
+                <div class="alert alert-info d-flex align-items-center gap-3 rounded-3 mb-4" data-aos="fade-up">
+                    <i class="bi bi-ticket-perforated-fill fs-3 text-primary"></i>
+                    <div>
+                        <strong>Voucher:</strong> {{ voucher.voucher_number }} &bull;
+                        <strong>Amount:</strong> ₹{{ voucher.amount }} &bull;
+                        <strong>Valid till:</strong> {{ voucher.expiry_date|date:"d M Y" }}
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4" data-aos="fade-up" data-aos-delay="100">
+                    <h4 class="fw-bold mb-4" style="color:#0A2463">
+                        <i class="bi bi-send me-2"></i>Submit Redemption Request
+                    </h4>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Travel Package (Optional)</label>
+                                {{ form.package }}
+                                <div class="form-text text-muted">Select a specific package you wish to redeem for, or leave blank for general redemption.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Preferred Travel Date</label>
+                                {{ form.travel_date }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Number of Persons</label>
+                                {{ form.number_of_persons }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Special Requests</label>
+                                {{ form.special_requests }}
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning mt-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Note:</strong> Your redemption request will be reviewed by our team within 24–48 hours.
+                            You will receive a notification once approved.
+                        </div>
+
+                        <div class="d-flex gap-3 mt-3">
+                            <button type="submit" class="btn btn-primary btn-lg flex-fill">
+                                <i class="bi bi-send me-2"></i>Submit Redemption Request
+                            </button>
+                            <a href="{% url 'vouchers:detail' voucher.voucher_number %}" class="btn btn-outline-secondary btn-lg">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Steps -->
+                <div class="card border-0 bg-light rounded-4 p-4 mt-4" data-aos="fade-up">
+                    <h6 class="fw-bold mb-3">What Happens Next?</h6>
+                    <div class="d-flex flex-column gap-3">
+                        {% for step in "1234" %}
+                        <div class="d-flex gap-3 align-items-start">
+                            <div class="step-badge-sm">{{ forloop.counter }}</div>
+                            <div>
+                                {% if forloop.counter == 1 %}<strong>Request Submitted</strong> – You submit your redemption request with travel preferences.
+                                {% elif forloop.counter == 2 %}<strong>Admin Review</strong> – Our team reviews your request within 24–48 hours.
+                                {% elif forloop.counter == 3 %}<strong>Notification Sent</strong> – You receive an approval/rejection notification.
+                                {% else %}<strong>Travel Confirmed</strong> – Upon approval, your booking is confirmed. Enjoy! 🎉{% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

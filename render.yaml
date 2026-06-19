@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: urban-holidays
+    env: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate --no-input"
+    startCommand: "gunicorn urbanholidays.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: DATABASE_URL
+        fromDatabase:
+          name: urban-holidays-db
+          property: connectionString
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: SITE_NAME
+        value: "Urban Holidays"
+      - key: VOUCHER_PRICE
+        value: "149"
+      - key: REFERRAL_BONUS
+        value: "50"
+
+databases:
+  - name: urban-holidays-db
+    databaseName: urbanholidays
+    user: urbanholidays_user

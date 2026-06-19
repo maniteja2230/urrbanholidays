@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile – Urban Holidays{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-header {
+    background: linear-gradient(135deg, #0A2463, #1E90FF);
+    padding: 60px 0 120px;
+    color: white;
+}
+.profile-avatar {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+}
+.profile-card {
+    margin-top: -80px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    background: white;
+}
+.stat-card {
+    background: linear-gradient(135deg, #0A2463, #1E90FF);
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+.stat-card:hover { transform: translateY(-5px); }
+.stat-card .stat-num { font-size: 2rem; font-weight: 700; }
+.stat-card .stat-label { font-size: 0.8rem; opacity: 0.85; }
+.form-section { border-left: 4px solid #1E90FF; padding-left: 20px; margin-bottom: 30px; }
+.form-section h5 { color: #0A2463; font-weight: 700; }
+.referral-box {
+    background: linear-gradient(135deg, #f8f9ff, #e8f0ff);
+    border: 2px dashed #1E90FF;
+    border-radius: 15px;
+    padding: 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="profile-header">
+    <div class="container">
+        <div class="d-flex align-items-center gap-4">
+            {% if profile.profile_photo %}
+                <img src="{{ profile.profile_photo.url }}" alt="Profile Photo" class="profile-avatar">
+            {% else %}
+                <div class="profile-avatar text-white">
+                    {{ request.user.first_name|first|default:request.user.username|first|upper }}
+                </div>
+            {% endif %}
+            <div>
+                <h2 class="fw-bold mb-1">{{ request.user.get_full_name|default:request.user.username }}</h2>
+                <p class="mb-0 opacity-75">
+                    <i class="bi bi-envelope me-2"></i>{{ request.user.email }}
+                    {% if profile.phone %}
+                    <span class="ms-3"><i class="bi bi-phone me-1"></i>{{ profile.phone }}</span>
+                    {% endif %}
+                </p>
+                <p class="mb-0 opacity-75 small mt-1">
+                    Member since {{ request.user.date_joined|date:"F Y" }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-num">{{ profile.total_vouchers }}</div>
+                <div class="stat-label">Total Vouchers</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-num">₹{{ profile.wallet_balance }}</div>
+                <div class="stat-label">Wallet Balance</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-num">{{ profile.total_referrals }}</div>
+                <div class="stat-label">Referrals</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-num">{{ request.user.vouchers.filter.is_redeemed.count|default:"0" }}</div>
+                <div class="stat-label">Redeemed</div>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Edit Profile Form -->
+        <div class="col-lg-8">
+            <div class="profile-card p-4">
+                <h4 class="fw-bold mb-4" style="color:#0A2463">
+                    <i class="bi bi-person-gear me-2"></i>Edit Profile
+                </h4>
+
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    <div class="form-section">
+                        <h5 class="mb-3">Personal Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Email</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Mobile Number</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Date of Birth</label>
+                                {{ form.date_of_birth }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Gender</label>
+                                {{ form.gender }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h5 class="mb-3">Address</h5>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Address</label>
+                                {{ form.address }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">City</label>
+                                {{ form.city }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">State</label>
+                                {{ form.state }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Pincode</label>
+                                {{ form.pincode }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h5 class="mb-3">Profile Photo</h5>
+                        {% if profile.profile_photo %}
+                            <img src="{{ profile.profile_photo.url }}" class="rounded-circle mb-2" width="60" height="60" style="object-fit:cover">
+                        {% endif %}
+                        {{ form.profile_photo }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="bi bi-save me-2"></i>Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar: Referral -->
+        <div class="col-lg-4">
+            <div class="referral-box mb-4">
+                <h6 class="fw-bold mb-3" style="color:#0A2463">
+                    <i class="bi bi-gift me-2 text-primary"></i>Your Referral Code
+                </h6>
+                <div class="input-group mb-3">
+                    <input type="text" id="refCode" class="form-control fw-bold text-center"
+                           value="{{ profile.referral_code }}" readonly style="font-size:1.3rem;letter-spacing:3px;">
+                    <button class="btn btn-primary" onclick="copyRefCode()">
+                        <i class="bi bi-copy"></i>
+                    </button>
+                </div>
+                <p class="text-muted small mb-3">Share this code with friends. Earn ₹{{ REFERRAL_BONUS }} for every successful referral!</p>
+                <div class="d-flex gap-2">
+                    <a href="https://wa.me/?text=Join%20Urban%20Holidays%20with%20my%20referral%20code%20{{ profile.referral_code }}%20and%20get%20amazing%20travel%20deals!%20{{ profile.get_referral_link }}"
+                       class="btn btn-success btn-sm flex-fill" target="_blank">
+                        <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                    </a>
+                    <button class="btn btn-outline-primary btn-sm flex-fill" onclick="copyRefLink()">
+                        <i class="bi bi-link-45deg me-1"></i>Copy Link
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3" style="color:#0A2463">Quick Links</h6>
+                    <a href="{% url 'dashboard:my_vouchers' %}" class="d-flex align-items-center py-2 text-decoration-none text-dark border-bottom">
+                        <i class="bi bi-ticket-perforated me-3 text-primary fs-5"></i>
+                        <span>My Vouchers</span>
+                        <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                    </a>
+                    <a href="{% url 'dashboard:transactions' %}" class="d-flex align-items-center py-2 text-decoration-none text-dark border-bottom">
+                        <i class="bi bi-clock-history me-3 text-primary fs-5"></i>
+                        <span>Transaction History</span>
+                        <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                    </a>
+                    <a href="{% url 'dashboard:referrals' %}" class="d-flex align-items-center py-2 text-decoration-none text-dark">
+                        <i class="bi bi-people me-3 text-primary fs-5"></i>
+                        <span>My Referrals</span>
+                        <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyRefCode() {
+    const code = document.getElementById('refCode').value;
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('Referral code copied!');
+    });
+}
+function copyRefLink() {
+    const link = '{{ profile.get_referral_link }}';
+    navigator.clipboard.writeText(link).then(() => {
+        showToast('Referral link copied!');
+    });
+}
+function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.className = 'position-fixed bottom-0 end-0 p-3';
+    toast.style.zIndex = '9999';
+    toast.innerHTML = `<div class="toast show align-items-center text-bg-success border-0">
+        <div class="d-flex"><div class="toast-body">${msg}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.closest('.position-fixed').remove()"></button>
+        </div></div>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+</script>
+{% endblock %}

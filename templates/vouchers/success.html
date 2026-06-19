@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Voucher Purchase Successful – Urban Holidays{% endblock %}
+
+{% block extra_css %}
+<style>
+.success-section {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0A2463 0%, #1E90FF 100%);
+    display: flex;
+    align-items: center;
+    padding: 80px 0;
+}
+.success-card {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+    max-width: 700px;
+    width: 100%;
+}
+.success-header {
+    background: linear-gradient(135deg, #28A745, #20C997);
+    padding: 40px 30px;
+    text-align: center;
+    color: white;
+}
+.success-icon {
+    width: 90px; height: 90px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 45px;
+    border: 3px solid rgba(255,255,255,0.4);
+    animation: successPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes successPop {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.voucher-details-card {
+    background: linear-gradient(135deg, #f8faff, #e8f0ff);
+    border: 2px solid #E0EAFF;
+    border-radius: 16px;
+    padding: 25px;
+    margin: 25px;
+}
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-label { color: #666; font-size: 0.85rem; }
+.detail-value { font-weight: 600; color: #0A2463; }
+.coupon-code-box {
+    background: #0A2463;
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin: 0 25px 25px;
+}
+.coupon-code {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 6px;
+    color: #FFD700;
+    font-family: monospace;
+}
+.qr-section {
+    text-align: center;
+    margin: 0 25px 25px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="success-section">
+    <div class="container">
+        <div class="d-flex justify-content-center">
+            <div class="success-card">
+                <!-- Success Header -->
+                <div class="success-header">
+                    <div class="success-icon">🎉</div>
+                    <h2 class="fw-bold mb-1">Payment Successful!</h2>
+                    <p class="mb-0 opacity-80">Your Urban Holidays voucher has been created</p>
+                </div>
+
+                <!-- Voucher Details -->
+                <div class="voucher-details-card">
+                    <h5 class="fw-bold mb-3 text-center" style="color:#0A2463">
+                        <i class="bi bi-ticket-perforated me-2"></i>Voucher Details
+                    </h5>
+                    <div class="detail-row">
+                        <span class="detail-label">Voucher Number</span>
+                        <span class="detail-value">{{ voucher.voucher_number }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Voucher Amount</span>
+                        <span class="detail-value">₹{{ voucher.amount }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Customer Name</span>
+                        <span class="detail-value">{{ voucher.user.get_full_name|default:voucher.user.username }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Purchase Date</span>
+                        <span class="detail-value">{{ voucher.purchase_date|date:"d M Y, h:i A" }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Valid Till</span>
+                        <span class="detail-value text-success">{{ voucher.expiry_date|date:"d M Y" }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status</span>
+                        <span class="badge bg-success">Active</span>
+                    </div>
+                </div>
+
+                <!-- Coupon Code -->
+                {% if coupon %}
+                <div class="coupon-code-box">
+                    <div class="text-white-50 small mb-2">YOUR COUPON CODE</div>
+                    <div class="coupon-code" id="couponCode">{{ coupon.coupon_code }}</div>
+                    <button class="btn btn-outline-warning btn-sm mt-3" onclick="copyCoupon()">
+                        <i class="bi bi-copy me-1"></i>Copy Code
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- QR Code -->
+                {% if voucher.qr_code %}
+                <div class="qr-section">
+                    <p class="text-muted small mb-3">Scan QR code to verify your voucher</p>
+                    <img src="{{ voucher.qr_code.url }}" alt="QR Code" class="img-fluid"
+                         style="width:160px;height:160px;border:4px solid #e0eaff;border-radius:12px;padding:8px;">
+                </div>
+                {% endif %}
+
+                <!-- Actions -->
+                <div class="d-flex gap-3 p-4 pt-0 flex-wrap justify-content-center">
+                    <a href="{% url 'vouchers:download' voucher.voucher_number %}"
+                       class="btn btn-primary flex-fill" style="min-width:180px">
+                        <i class="bi bi-download me-2"></i>Download PDF
+                    </a>
+                    <a href="{% url 'dashboard:my_vouchers' %}"
+                       class="btn btn-outline-primary flex-fill" style="min-width:180px">
+                        <i class="bi bi-grid me-2"></i>My Vouchers
+                    </a>
+                </div>
+
+                <div class="text-center pb-4">
+                    <a href="{% url 'vouchers:redeem' voucher.voucher_number %}"
+                       class="btn btn-warning fw-semibold px-5">
+                        <i class="bi bi-arrow-right-circle me-2"></i>Redeem This Voucher
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyCoupon() {
+    const code = document.getElementById('couponCode').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        alert('Coupon code copied: ' + code);
+    });
+}
+</script>
+{% endblock %}

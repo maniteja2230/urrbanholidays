@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ package.name }} – Urban Holidays{% endblock %}
+
+{% block content %}
+<div class="page-hero" style="min-height:350px;">
+    {% if package.thumbnail %}
+    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:url('{{ package.thumbnail.url }}') center/cover;opacity:0.25;"></div>
+    {% endif %}
+    <div class="container text-center position-relative">
+        <span class="badge bg-primary mb-3">{{ package.get_category_display }}</span>
+        <h1 class="page-hero-title">{{ package.name }}</h1>
+        <p class="page-hero-subtitle">
+            <i class="bi bi-geo-alt me-1"></i>{{ package.destination.name|default:"India" }} &bull;
+            <i class="bi bi-moon ms-2 me-1"></i>{{ package.duration_nights }}N / {{ package.duration_days }}D
+        </p>
+    </div>
+</div>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Package Details -->
+            <div class="col-lg-8">
+                <!-- Description -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4" data-aos="fade-up">
+                    <h4 class="fw-bold mb-3" style="color:#0A2463">Package Overview</h4>
+                    <p class="text-muted">{{ package.description }}</p>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-3 col-6 text-center">
+                            <div class="meta-stat p-3 bg-light rounded-3">
+                                <i class="bi bi-moon-stars-fill text-primary fs-4"></i>
+                                <div class="fw-bold">{{ package.duration_nights }} Nights</div>
+                                <small class="text-muted">{{ package.duration_days }} Days</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 text-center">
+                            <div class="meta-stat p-3 bg-light rounded-3">
+                                <i class="bi bi-people-fill text-primary fs-4"></i>
+                                <div class="fw-bold">{{ package.max_persons }}</div>
+                                <small class="text-muted">Max Persons</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 text-center">
+                            <div class="meta-stat p-3 bg-light rounded-3">
+                                <i class="bi bi-star-fill text-warning fs-4"></i>
+                                <div class="fw-bold">{{ package.rating }}/5</div>
+                                <small class="text-muted">{{ package.review_count }} Reviews</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 text-center">
+                            <div class="meta-stat p-3 bg-light rounded-3">
+                                {% if package.is_voucher_applicable %}
+                                <i class="bi bi-ticket-perforated-fill text-success fs-4"></i>
+                                <div class="fw-bold text-success">Voucher</div>
+                                <small class="text-muted">Applicable</small>
+                                {% else %}
+                                <i class="bi bi-x-circle-fill text-danger fs-4"></i>
+                                <div class="fw-bold text-danger">Voucher</div>
+                                <small class="text-muted">Not Applicable</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Highlights -->
+                {% if package.highlights_list %}
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4" data-aos="fade-up">
+                    <h5 class="fw-bold mb-3" style="color:#0A2463">Package Highlights</h5>
+                    <div class="row g-2">
+                        {% for highlight in package.highlights_list %}
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                <span>{{ highlight }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Inclusions / Exclusions -->
+                <div class="row g-4 mb-4" data-aos="fade-up">
+                    {% if package.inclusions_list %}
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 h-100 border-start border-success border-3">
+                            <h6 class="fw-bold text-success mb-3"><i class="bi bi-check-circle me-2"></i>Inclusions</h6>
+                            {% for item in package.inclusions_list %}
+                            <div class="d-flex gap-2 mb-2"><i class="bi bi-plus-circle text-success mt-1"></i><span class="small">{{ item }}</span></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if package.exclusions_list %}
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 h-100 border-start border-danger border-3">
+                            <h6 class="fw-bold text-danger mb-3"><i class="bi bi-x-circle me-2"></i>Exclusions</h6>
+                            {% for item in package.exclusions_list %}
+                            <div class="d-flex gap-2 mb-2"><i class="bi bi-dash-circle text-danger mt-1"></i><span class="small">{{ item }}</span></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Booking Sidebar -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-lg rounded-4 p-4 sticky-top" style="top:90px" data-aos="fade-left">
+                    <h4 class="fw-bold text-center mb-4" style="color:#0A2463">Book This Package</h4>
+
+                    <div class="text-center mb-3">
+                        {% if package.original_price %}
+                            <small class="text-muted text-decoration-line-through fs-5">₹{{ package.original_price|intcomma }}</small>
+                        {% endif %}
+                        <div style="font-size:2.5rem;font-weight:800;color:#0A2463;">₹{{ package.price|intcomma }}</div>
+                        <small class="text-muted">per person</small>
+                        {% if package.discount_percent > 0 %}
+                        <div class="badge bg-success ms-2">{{ package.discount_percent }}% OFF</div>
+                        {% endif %}
+                    </div>
+
+                    {% if package.is_voucher_applicable %}
+                    <div class="alert alert-success small mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-ticket-perforated-fill fs-5"></i>
+                        <span>Use your Urban Holidays voucher for this package!</span>
+                    </div>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'vouchers:buy' %}" class="btn btn-primary w-100 btn-lg mb-2">
+                            <i class="bi bi-ticket-perforated me-2"></i>Buy Voucher & Book
+                        </a>
+                        <a href="{% url 'dashboard:my_vouchers' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-wallet me-2"></i>Use Existing Voucher
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary w-100 btn-lg mb-2">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login to Book
+                        </a>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-person-plus me-2"></i>Create Account
+                        </a>
+                    {% endif %}
+
+                    <div class="divider my-3 text-center text-muted small">── OR ──</div>
+                    <a href="{% url 'core:contact' %}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-chat me-2"></i>Enquire Now
+                    </a>
+
+                    <div class="security-badges mt-4 text-center">
+                        <small class="text-muted d-block mb-2">Secure & Trusted</small>
+                        <div class="d-flex justify-content-center gap-3">
+                            <span class="badge bg-light text-dark"><i class="bi bi-shield-check text-success me-1"></i>Secure</span>
+                            <span class="badge bg-light text-dark"><i class="bi bi-lock-fill text-primary me-1"></i>SSL</span>
+                            <span class="badge bg-light text-dark"><i class="bi bi-credit-card text-primary me-1"></i>Razorpay</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

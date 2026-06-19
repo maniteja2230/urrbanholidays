@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms & Conditions – Urban Holidays{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+    <div class="container text-center">
+        <h1 class="page-hero-title" data-aos="fade-up">Terms & Conditions</h1>
+        <p class="page-hero-subtitle" data-aos="fade-up" data-aos-delay="100">Last updated: January 2025</p>
+    </div>
+</div>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="card border-0 shadow-sm rounded-4 p-5" data-aos="fade-up">
+                    <div class="terms-content">
+                        <h4 class="fw-bold mb-3" style="color:#0A2463">1. Acceptance of Terms</h4>
+                        <p class="text-muted">By purchasing or using an Urban Holidays Mega Ticket Gift Voucher, you agree to these Terms and Conditions. Please read them carefully.</p>
+
+                        <h4 class="fw-bold mb-3 mt-4" style="color:#0A2463">2. Voucher Purchase</h4>
+                        <ul class="text-muted">
+                            <li>The Urban Holidays Mega Ticket Gift Voucher is priced at ₹{{ VOUCHER_PRICE }} per voucher.</li>
+                            <li>Payment is processed securely via Razorpay.</li>
+                            <li>Upon successful payment, a digital voucher with a unique coupon code and QR code is issued instantly.</li>
+                            <li>Vouchers are non-transferable and non-refundable unless otherwise specified.</li>
+                        </ul>
+
+                        <h4 class="fw-bold mb-3 mt-4" style="color:#0A2463">3. Voucher Validity & Usage</h4>
+                        <ul class="text-muted">
+                            <li>Each voucher is valid for 365 days from the date of purchase.</li>
+                            <li>Vouchers are redeemable for travel packages listed on Urban Holidays website.</li>
+                            <li>Each voucher can be redeemed only once.</li>
+                            <li>Expired vouchers cannot be redeemed or extended.</li>
+                            <li>Urban Holidays reserves the right to modify validity terms with prior notice.</li>
+                        </ul>
+
+                        <h4 class="fw-bold mb-3 mt-4" style="color:#0A2463">4. Redemption Process</h4>
+                        <ul class="text-muted">
+                            <li>Users must submit a redemption request through the dashboard.</li>
+                            <li>Redemption requests are subject to availability and admin approval.</li>
+                            <li>Processing time is 24–48 business hours.</li>
+                            <li>Travel dates are subject to availability confirmation from our team.</li>
+                        </ul>
+
+                        <h4 class="fw-bold mb-3 mt-4" style="color:#0A2463">5. Referral Program</h4>
+                        <ul class="text-muted">
+                            <li>Referral bonuses are credited to the wallet upon successful voucher purchase by the referred user.</li>
+                            <li>Wallet credits can be used for future voucher purchases.</li>
+                            <li>Urban Holidays reserves the right to modify or terminate the referral program at any time.</li>
+                        </ul>
+
+                        <h4 class="fw-bold mb-3 mt-4" style="color:#0A2463">6. Cancellations & Refunds</h4>
+                        <ul class="text-muted">
+                            <li>Vouchers are generally non-refundable after purchase.</li>
+                            <li>In case of genuine technical errors or duplicate charges, refunds will be processed within 7–10 business days.</li>
+                            <li>Contact support@urbanholidays.com for refund requests.</li>
+                        </ul>
+
+                        <h4 class="fw-bold mb-3 mt-4" style="color:#0A2463">7. Limitation of Liability</h4>
+                        <p class="text-muted">Urban Holidays is not responsible for any loss, damage, injury, or disappointment suffered as a result of using our vouchers or services. Our maximum liability shall not exceed the voucher purchase amount.</p>
+
+                        <h4 class="fw-bold mb-3 mt-4" style="color:#0A2463">8. Contact</h4>
+                        <p class="text-muted">For any queries, contact us at <a href="mailto:support@urbanholidays.com">support@urbanholidays.com</a> or call +91 9999 999 999.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

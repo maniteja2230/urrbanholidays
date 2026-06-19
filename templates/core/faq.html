@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ – Urban Holidays{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+    <div class="container text-center">
+        <h1 class="page-hero-title" data-aos="fade-up">Frequently Asked Questions</h1>
+        <p class="page-hero-subtitle" data-aos="fade-up" data-aos-delay="100">Find answers to your questions about our vouchers and services</p>
+    </div>
+</div>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                {% if faqs %}
+                    <div class="accordion faq-accordion" id="faqAccordion" data-aos="fade-up">
+                        {% for faq in faqs %}
+                        <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %} fw-semibold"
+                                        type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faq{{ faq.id }}">
+                                    <i class="bi bi-question-circle-fill text-primary me-3"></i>
+                                    {{ faq.question }}
+                                </button>
+                            </h2>
+                            <div id="faq{{ faq.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+                                 data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    {{ faq.answer }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <!-- Static FAQ if none in DB -->
+                    <div class="accordion faq-accordion" id="faqAccordion" data-aos="fade-up">
+                        <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#sfaq1">
+                                    <i class="bi bi-question-circle-fill text-primary me-3"></i>
+                                    What is the Urban Holidays Mega Ticket Voucher?
+                                </button>
+                            </h2>
+                            <div id="sfaq1" class="accordion-collapse collapse show">
+                                <div class="accordion-body text-muted">
+                                    The Urban Holidays Mega Ticket Gift Voucher is a ₹{{ VOUCHER_PRICE }} digital voucher that gives you access to exclusive travel packages across India and international destinations. Each voucher comes with a unique QR code and coupon code.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#sfaq2">
+                                    <i class="bi bi-question-circle-fill text-primary me-3"></i>
+                                    How do I purchase a voucher?
+                                </button>
+                            </h2>
+                            <div id="sfaq2" class="accordion-collapse collapse">
+                                <div class="accordion-body text-muted">
+                                    Register/login to your account → Click "Buy Voucher" → Complete payment via Razorpay (UPI, Cards, Netbanking) → Your digital voucher is instantly generated in your dashboard.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#sfaq3">
+                                    <i class="bi bi-question-circle-fill text-primary me-3"></i>
+                                    How long is the voucher valid?
+                                </button>
+                            </h2>
+                            <div id="sfaq3" class="accordion-collapse collapse">
+                                <div class="accordion-body text-muted">
+                                    Each voucher is valid for 365 days from the date of purchase. The expiry date is clearly shown on your voucher and in your dashboard.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#sfaq4">
+                                    <i class="bi bi-question-circle-fill text-primary me-3"></i>
+                                    How do I redeem my voucher?
+                                </button>
+                            </h2>
+                            <div id="sfaq4" class="accordion-collapse collapse">
+                                <div class="accordion-body text-muted">
+                                    Go to Dashboard → My Vouchers → Select your voucher → Click "Redeem" → Choose a package and submit your request. Our team will review and approve within 24–48 hours.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#sfaq5">
+                                    <i class="bi bi-question-circle-fill text-primary me-3"></i>
+                                    Can I download my voucher?
+                                </button>
+                            </h2>
+                            <div id="sfaq5" class="accordion-collapse collapse">
+                                <div class="accordion-body text-muted">
+                                    Yes! Every voucher can be downloaded as a PDF from your dashboard. The PDF contains your voucher number, QR code, coupon code, and all important details.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#sfaq6">
+                                    <i class="bi bi-question-circle-fill text-primary me-3"></i>
+                                    How does the referral program work?
+                                </button>
+                            </h2>
+                            <div id="sfaq6" class="accordion-collapse collapse">
+                                <div class="accordion-body text-muted">
+                                    Every user gets a unique referral code. Share it with friends. When a friend registers using your code and makes their first purchase, you earn ₹{{ REFERRAL_BONUS }} as a wallet credit. You can view all referrals in your dashboard.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#sfaq7">
+                                    <i class="bi bi-question-circle-fill text-primary me-3"></i>
+                                    What payment methods are accepted?
+                                </button>
+                            </h2>
+                            <div id="sfaq7" class="accordion-collapse collapse">
+                                <div class="accordion-body text-muted">
+                                    We accept all major payment methods via Razorpay: UPI (Google Pay, PhonePe, Paytm), Credit/Debit Cards (Visa, Mastercard, RuPay), Net Banking, and EMI options.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Still have questions? -->
+                <div class="text-center mt-5" data-aos="fade-up">
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h5 class="fw-bold mb-2">Still have questions?</h5>
+                        <p class="text-muted mb-3">Our support team is happy to help you.</p>
+                        <a href="{% url 'core:contact' %}" class="btn btn-primary px-5">
+                            <i class="bi bi-envelope me-2"></i>Contact Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

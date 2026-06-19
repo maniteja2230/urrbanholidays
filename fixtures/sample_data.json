@@ -1,0 +1,215 @@
+[
+  {
+    "model": "packages.destination",
+    "pk": 1,
+    "fields": {
+      "name": "Goa",
+      "country": "India",
+      "description": "The beach paradise of India",
+      "is_active": true
+    }
+  },
+  {
+    "model": "packages.destination",
+    "pk": 2,
+    "fields": {
+      "name": "Kerala",
+      "country": "India",
+      "description": "God's own country",
+      "is_active": true
+    }
+  },
+  {
+    "model": "packages.destination",
+    "pk": 3,
+    "fields": {
+      "name": "Rajasthan",
+      "country": "India",
+      "description": "Land of Kings",
+      "is_active": true
+    }
+  },
+  {
+    "model": "packages.destination",
+    "pk": 4,
+    "fields": {
+      "name": "Himachal Pradesh",
+      "country": "India",
+      "description": "Mountain paradise",
+      "is_active": true
+    }
+  },
+  {
+    "model": "packages.travelpackage",
+    "pk": 1,
+    "fields": {
+      "name": "Goa Beach Paradise",
+      "slug": "goa-beach-paradise",
+      "destination": 1,
+      "category": "beach",
+      "price": "15999.00",
+      "original_price": "22999.00",
+      "discount_percent": 30,
+      "duration_days": 4,
+      "duration_nights": 3,
+      "max_persons": 8,
+      "description": "Experience the magical beaches of Goa with this all-inclusive package. Enjoy pristine white sands, vibrant nightlife, and delicious Goan cuisine.",
+      "highlights": "North Goa Beach Tour\nSouth Goa Exploration\nCasino Night\nWater Sports\nSunset Cruise",
+      "inclusions": "3 Night Hotel Stay (3-Star)\nBreakfast Daily\nAirport Transfers\nSightseeing by AC Vehicle\nTravel Insurance",
+      "exclusions": "Flights\nLunch & Dinner\nPersonal Expenses\nAlcohol",
+      "is_active": true,
+      "is_featured": true,
+      "is_voucher_applicable": true,
+      "rating": "4.7",
+      "review_count": 234
+    }
+  },
+  {
+    "model": "packages.travelpackage",
+    "pk": 2,
+    "fields": {
+      "name": "Kerala Backwaters Retreat",
+      "slug": "kerala-backwaters-retreat",
+      "destination": 2,
+      "category": "beach",
+      "price": "18999.00",
+      "original_price": "25999.00",
+      "discount_percent": 27,
+      "duration_days": 5,
+      "duration_nights": 4,
+      "max_persons": 6,
+      "description": "Discover the serene backwaters of Kerala on a traditional houseboat. This package includes Munnar tea gardens, Alleppey backwaters, and Kochi heritage walks.",
+      "highlights": "Alleppey Houseboat Stay\nMunnar Tea Gardens\nKochi Heritage Walk\nKathakali Performance\nAyurvedic Spa",
+      "inclusions": "4 Night Accommodation\nAll Meals on Houseboat\nAC Transfers\nGuide Services\nSpice Plantation Tour",
+      "exclusions": "Flights\nPersonal Shopping\nExtra Activities",
+      "is_active": true,
+      "is_featured": true,
+      "is_voucher_applicable": true,
+      "rating": "4.9",
+      "review_count": 189
+    }
+  },
+  {
+    "model": "packages.travelpackage",
+    "pk": 3,
+    "fields": {
+      "name": "Rajasthan Royal Heritage",
+      "slug": "rajasthan-royal-heritage",
+      "destination": 3,
+      "category": "cultural",
+      "price": "24999.00",
+      "original_price": "34999.00",
+      "discount_percent": 29,
+      "duration_days": 7,
+      "duration_nights": 6,
+      "max_persons": 10,
+      "description": "Walk the royal corridors of Rajasthan's magnificent palaces and forts. Experience the desert safari, folk music, and the vibrant culture of the Land of Kings.",
+      "highlights": "Jaipur Pink City Tour\nAmber Fort & Palace\nJodhpur Blue City\nJaisalmer Desert Safari\nUdaipur Lake Palace",
+      "inclusions": "6 Night Heritage Hotel Stay\nAll Breakfasts\nPrivate AC Coach\nProfessional Guide\nCamel Safari\nFolk Cultural Evening",
+      "exclusions": "Flights\nLunch & Dinner\nEntrance Fees\nPersonal Expenses",
+      "is_active": true,
+      "is_featured": true,
+      "is_voucher_applicable": true,
+      "rating": "4.8",
+      "review_count": 312
+    }
+  },
+  {
+    "model": "packages.travelpackage",
+    "pk": 4,
+    "fields": {
+      "name": "Shimla Manali Snow Escape",
+      "slug": "shimla-manali-snow-escape",
+      "destination": 4,
+      "category": "hill",
+      "price": "19999.00",
+      "original_price": "27999.00",
+      "discount_percent": 29,
+      "duration_days": 6,
+      "duration_nights": 5,
+      "max_persons": 8,
+      "description": "Escape to the snow-capped Himalayas with this comprehensive Shimla-Manali package. Enjoy ski slopes, scenic valleys, and charming hill station towns.",
+      "highlights": "Shimla Mall Road & Ridge\nKufri Snow Activities\nManali Old Town\nSolang Valley\nRohtang Pass",
+      "inclusions": "5 Night Hotel Stay\nBreakfast & Dinner\nVolvo Bus Transfers\nSightseeing\nSnow Activity (Kufri)",
+      "exclusions": "Flights/Train\nPersonal Expenses\nParachuting/Skiing Fees",
+      "is_active": true,
+      "is_featured": false,
+      "is_voucher_applicable": true,
+      "rating": "4.6",
+      "review_count": 156
+    }
+  },
+  {
+    "model": "core.faq",
+    "pk": 1,
+    "fields": {
+      "question": "What is the Urban Holidays Mega Ticket Voucher?",
+      "answer": "The Urban Holidays Mega Ticket Gift Voucher is a ₹149 digital voucher that gives you access to exclusive travel packages across India and international destinations. Each voucher comes with a unique QR code and coupon code.",
+      "order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.faq",
+    "pk": 2,
+    "fields": {
+      "question": "How do I purchase a voucher?",
+      "answer": "Register or login to your account → Click 'Buy Voucher' → Complete payment via Razorpay (UPI, Cards, Netbanking) → Your digital voucher is instantly generated in your dashboard.",
+      "order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.faq",
+    "pk": 3,
+    "fields": {
+      "question": "How long is the voucher valid?",
+      "answer": "Each voucher is valid for 365 days from the date of purchase. The expiry date is clearly shown on your voucher and in your dashboard.",
+      "order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.faq",
+    "pk": 4,
+    "fields": {
+      "question": "How does the referral program work?",
+      "answer": "Every user gets a unique referral code. Share it with friends. When a friend registers using your code, you earn ₹50 as a wallet credit. You can view all referrals in your dashboard.",
+      "order": 4,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.testimonial",
+    "pk": 1,
+    "fields": {
+      "name": "Priya Sharma",
+      "location": "Mumbai",
+      "message": "Bought the voucher for just ₹149 and redeemed it for an amazing Goa trip. The process was seamless and the team was very helpful!",
+      "rating": 5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.testimonial",
+    "pk": 2,
+    "fields": {
+      "name": "Rahul Verma",
+      "location": "Delhi",
+      "message": "Excellent service! The digital voucher with QR code is very convenient. Got a great deal on the Kerala package. Highly recommend!",
+      "rating": 5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.testimonial",
+    "pk": 3,
+    "fields": {
+      "name": "Ananya Reddy",
+      "location": "Hyderabad",
+      "message": "The referral bonus feature is amazing. I earned ₹50 extra when my friend joined. Urban Holidays is the best travel voucher platform!",
+      "rating": 5,
+      "is_active": true
+    }
+  }
+]
