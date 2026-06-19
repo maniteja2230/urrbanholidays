@@ -1,0 +1,22 @@
+[Unit]
+Description=Urban Holidays Django Application
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/var/www/urbanholidays
+Environment="PATH=/var/www/urbanholidays/venv/bin"
+EnvironmentFile=/var/www/urbanholidays/.env
+ExecStart=/var/www/urbanholidays/venv/bin/gunicorn \
+    urbanholidays.wsgi:application \
+    --workers 4 \
+    --bind unix:/var/www/urbanholidays/gunicorn.sock \
+    --timeout 120 \
+    --access-logfile /var/log/urbanholidays/access.log \
+    --error-logfile /var/log/urbanholidays/error.log
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
