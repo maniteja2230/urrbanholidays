@@ -126,11 +126,22 @@
 
         <div class="px-3 pb-2 text-center">
           <div class="qr-box">
-            <!-- Your Paytm QR code image here -->
-            <img src="{% static 'images/paytm_qr.png' %}" alt="Paytm QR Code"
-                 onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=paytm://pay?pa=YOURPAYTMID@paytm%26am=149%26tn=UrbanHolidaysVoucher'">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=9019852352@pthdfc%26pn=Urban%2520Holidays%26am=149%26tn=Urban%2520Holidays%2520Voucher%26cu=INR"
+                 alt="Paytm QR Code – Urban Holidays" style="width:200px;height:200px;">
             <div class="qr-label">🔵 Scan with any UPI app</div>
-            <div class="upi-id">Paytm · GPay · PhonePe · BHIM</div>
+            <div class="upi-id" style="font-size:0.85rem; color:#1565C0; font-weight:700; margin-top:4px;">
+              9019852352@pthdfc
+            </div>
+            <div style="font-size:0.75rem; color:#888; margin-top:2px;">Urban Holidays ✅ Verified</div>
+            <div style="display:flex; justify-content:center; gap:8px; margin-top:8px; align-items:center;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/100px-Paytm_Logo_%28standalone%29.svg.png" height="18" alt="Paytm">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/100px-Google_Pay_Logo.svg.png" height="18" alt="GPay">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/100px-PhonePe_Logo.svg.png" height="18" alt="PhonePe">
+            </div>
+          </div>
+          <div class="mt-2 text-center">
+            <small style="color:rgba(255,255,255,0.6);">Or pay manually to UPI ID:</small><br>
+            <span style="color:#FFD700; font-weight:700; font-size:1rem; letter-spacing:0.5px;">9019852352@pthdfc</span>
           </div>
 
           <div class="mt-3 alert-info-custom">
