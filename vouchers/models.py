@@ -25,6 +25,7 @@ def generate_coupon_code():
 class Voucher(models.Model):
     """Main voucher model"""
     STATUS_CHOICES = [
+        ('pending_payment', 'Pending Payment Verification'),
         ('active', 'Active'),
         ('used', 'Used'),
         ('expired', 'Expired'),
@@ -55,6 +56,21 @@ class Voucher(models.Model):
         on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name='voucher'
+    )
+
+    # Paytm / Manual UPI payment
+    utr_number = models.CharField(
+        max_length=50, blank=True,
+        help_text='UPI Transaction / UTR number submitted by customer'
+    )
+    payment_screenshot = models.ImageField(
+        upload_to='vouchers/payment_proofs/',
+        blank=True, null=True,
+        help_text='Payment screenshot uploaded by customer'
+    )
+    payment_method = models.CharField(
+        max_length=30, default='paytm_qr',
+        help_text='paytm_qr / razorpay / manual'
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

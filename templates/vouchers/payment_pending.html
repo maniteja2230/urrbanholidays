@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Under Verification – Urban Holidays{% endblock %}
+
+{% block extra_css %}
+<style>
+  body { background: linear-gradient(135deg, #0a1628 0%, #1a2f5e 100%); min-height: 100vh; }
+  .pending-card {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,215,0,0.25);
+    border-radius: 20px;
+    overflow: hidden;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .pending-header {
+    background: linear-gradient(135deg, #FF8C00, #FFD700);
+    padding: 2.5rem 2rem;
+    text-align: center;
+  }
+  .pending-icon { font-size: 4rem; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+  .pending-header h2 { color: #0A2463; font-weight: 800; font-size: 1.8rem; margin: 0.5rem 0 0; }
+  .pending-body { padding: 2rem; }
+  .info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    color: rgba(255,255,255,0.9);
+    font-size: 0.9rem;
+  }
+  .info-row strong { color: #FFD700; }
+  .timeline { margin: 1.5rem 0; }
+  .tl-item {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding-bottom: 1rem; position: relative;
+  }
+  .tl-item:not(:last-child)::before {
+    content: ''; position: absolute;
+    left: 14px; top: 30px; width: 2px;
+    height: calc(100% - 10px);
+    background: rgba(255,215,0,0.2);
+  }
+  .tl-dot {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 0.8rem; font-weight: 700;
+  }
+  .tl-dot.done  { background: #28a745; color: white; }
+  .tl-dot.active { background: #FFD700; color: #0A2463; animation: pulse 2s infinite; }
+  .tl-dot.wait  { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
+  .tl-text { color: rgba(255,255,255,0.85); font-size: 0.88rem; padding-top: 5px; }
+  .tl-text strong { color: white; }
+  .btn-dash {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #0A2463; font-weight: 700;
+    border: none; border-radius: 50px;
+    padding: 0.75rem 2rem; width: 100%;
+    font-size: 1rem; transition: all 0.3s;
+  }
+  .btn-dash:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,215,0,0.4); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="pending-card">
+    <div class="pending-header">
+      <div class="pending-icon">⏳</div>
+      <h2>Payment Under Verification</h2>
+      <p style="color:#0A2463; margin:0.3rem 0 0; opacity:0.8">We'll activate your voucher within 30 minutes!</p>
+    </div>
+
+    <div class="pending-body">
+
+      <!-- Voucher Info -->
+      <div class="info-row">
+        <span>Voucher Number</span>
+        <strong>{{ voucher.voucher_number }}</strong>
+      </div>
+      <div class="info-row">
+        <span>Amount</span>
+        <strong>₹{{ voucher.amount }}</strong>
+      </div>
+      <div class="info-row">
+        <span>UTR / Transaction ID</span>
+        <strong>{{ voucher.utr_number }}</strong>
+      </div>
+      <div class="info-row">
+        <span>Status</span>
+        <strong style="color:#FF8C00">⏳ Pending Verification</strong>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline mt-4">
+        <div class="tl-item">
+          <div class="tl-dot done">✓</div>
+          <div class="tl-text"><strong>Payment Submitted</strong><br>Your UTR number received</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot active">⟳</div>
+          <div class="tl-text"><strong>Payment Verification</strong><br>Our team is verifying your payment (within 30 min)</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot wait">3</div>
+          <div class="tl-text"><strong>Voucher Activation</strong><br>QR code generated, voucher activated</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot wait">4</div>
+          <div class="tl-text"><strong>Email Confirmation</strong><br>Voucher details sent to {{ request.user.email }}</div>
+        </div>
+      </div>
+
+      <div class="alert" style="background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.3); border-radius:10px; color:rgba(255,255,255,0.85); font-size:0.85rem;">
+        <strong>📞 Need faster help?</strong><br>
+        WhatsApp us: <strong>+91 XXXXXXXXXX</strong><br>
+        Email: <strong>support@urrbanholidays.in</strong><br>
+        Business hours: 9 AM – 8 PM (Mon–Sat)
+      </div>
+
+      <a href="{% url 'dashboard:index' %}" class="btn btn-dash mt-3">
+        <i class="fas fa-home me-2"></i> Go to Dashboard
+      </a>
+
+      <p class="text-center mt-3 text-white-50" style="font-size:0.8rem;">
+        Your voucher will appear in My Vouchers once verified ✅
+      </p>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

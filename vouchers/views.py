@@ -1,20 +1,19 @@
 """
-Vouchers app views – Get Voucher, Buy (Razorpay), Detail, Redeem, Download PDF
+Vouchers app views – Paytm QR payment flow + Voucher detail, Redeem, PDF
 """
 
 import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.conf import settings
-from django.db import transaction
+from django.utils import timezone
+from datetime import timedelta
 
 from .models import Voucher, Coupon, Redemption
 from .forms import RedemptionForm
 from .utils import generate_voucher_pdf
-from payments.models import PaymentTransaction
-from payments.utils import create_razorpay_order
 
 logger = logging.getLogger(__name__)
 
@@ -22,55 +21,67 @@ logger = logging.getLogger(__name__)
 @login_required
 def buy_voucher(request):
     """
-    'Get Voucher' page – shows voucher details, creates a Razorpay order
-    server-side and passes order_id + key to the template so the
-    Razorpay checkout can fire directly without any extra API call.
+    Paytm QR payment page.
+    Shows QR code + form to enter UTR/Transaction ID after paying.
     """
-    amount = settings.VOUCHER_PRICE          # e.g. 149 (rupees)
-    razorpay_order_id = ''
-    error = None
+    amount = settings.VOUCHER_PRICE  # 149
 
-    try:
-        profile = getattr(request.user, 'profile', None)
-        order = create_razorpay_order(
+    if request.method == 'POST':
+        utr = request.POST.get('utr_number', '').strip()
+        screenshot = request.FILES.get('payment_screenshot')
+
+        if not utr:
+            messages.error(request, 'Please enter your UPI Transaction ID / UTR number.')
+            return render(request, 'vouchers/buy.html', {'amount': amount})
+
+        # Check if UTR already used (prevent duplicates)
+        if Voucher.objects.filter(utr_number=utr).exists():
+            messages.error(request, 'This Transaction ID has already been submitted. Please contact support.')
+            return render(request, 'vouchers/buy.html', {'amount': amount})
+
+        # Create voucher in pending_payment status
+        voucher = Voucher.objects.create(
+            user=request.user,
             amount=amount,
-            currency='INR',
-            notes={
-                'user_id': str(request.user.id),
-                'username': request.user.username,
-                'type': 'voucher_purchase',
-            }
+            status='pending_payment',
+            utr_number=utr,
+            payment_method='paytm_qr',
+            expiry_date=timezone.now() + timedelta(days=settings.VOUCHER_VALIDITY_DAYS),
         )
-        razorpay_order_id = order.get('id', '')
 
-        # Persist a pending transaction so payment_callback can locate it
-        PaymentTransaction.objects.get_or_create(
-            razorpay_order_id=razorpay_order_id,
-            defaults={
-                'user': request.user,
-                'amount': amount,
-                'currency': 'INR',
-                'status': 'created',
-                'notes': {'type': 'voucher_purchase'},
-            }
-        )
-    except Exception as e:
-        logger.error(f"Razorpay order creation error: {e}")
-        error = "Unable to create payment order. Please try again."
+        # Save screenshot if uploaded
+        if screenshot:
+            voucher.payment_screenshot = screenshot
+            voucher.save()
 
-    profile = getattr(request.user, 'profile', None)
+        # Notify admins
+        try:
+            from notifications.models import Notification
+            from django.contrib.auth.models import User as AuthUser
+            for admin in AuthUser.objects.filter(is_staff=True):
+                Notification.objects.create(
+                    user=admin,
+                    title='💰 New Payment Verification Required',
+                    message=(
+                        f'User {request.user.username} paid ₹{amount} via Paytm. '
+                        f'UTR: {utr}. Voucher: {voucher.voucher_number}. '
+                        f'Please verify and activate in admin panel.'
+                    ),
+                    notification_type='voucher',
+                )
+        except Exception as e:
+            logger.warning(f"Admin notification failed: {e}")
 
-    context = {
-        'amount': amount,
-        'amount_paise': int(amount) * 100,           # Razorpay SDK expects paise
-        'razorpay_order_id': razorpay_order_id,
-        'razorpay_key': settings.RAZORPAY_KEY_ID,
-        'user_name': request.user.get_full_name() or request.user.username,
-        'user_email': request.user.email,
-        'user_phone': getattr(profile, 'phone', '') or '',
-        'error': error,
-    }
-    return render(request, 'vouchers/buy.html', context)
+        return redirect('vouchers:payment_pending', voucher_number=voucher.voucher_number)
+
+    return render(request, 'vouchers/buy.html', {'amount': amount})
+
+
+@login_required
+def payment_pending(request, voucher_number):
+    """Show pending verification page after UTR submission"""
+    voucher = get_object_or_404(Voucher, voucher_number=voucher_number, user=request.user)
+    return render(request, 'vouchers/payment_pending.html', {'voucher': voucher})
 
 
 @login_required
@@ -90,12 +101,11 @@ def voucher_detail(request, voucher_number):
     voucher = get_object_or_404(Voucher, voucher_number=voucher_number, user=request.user)
     coupon = getattr(voucher, 'coupon', None)
     redemptions = voucher.redemptions.all()
-    context = {
+    return render(request, 'vouchers/detail.html', {
         'voucher': voucher,
         'coupon': coupon,
         'redemptions': redemptions,
-    }
-    return render(request, 'vouchers/detail.html', context)
+    })
 
 
 @login_required
@@ -104,7 +114,7 @@ def redeem_voucher(request, voucher_number):
     voucher = get_object_or_404(Voucher, voucher_number=voucher_number, user=request.user)
 
     if voucher.status != 'active':
-        messages.error(request, f'This voucher is {voucher.status} and cannot be redeemed.')
+        messages.error(request, f'This voucher is {voucher.get_status_display()} and cannot be redeemed.')
         return redirect('vouchers:detail', voucher_number=voucher_number)
 
     if voucher.is_expired:
@@ -114,7 +124,7 @@ def redeem_voucher(request, voucher_number):
         return redirect('vouchers:detail', voucher_number=voucher_number)
 
     if voucher.redemptions.filter(status='pending').exists():
-        messages.warning(request, 'You already have a pending redemption request for this voucher.')
+        messages.warning(request, 'You already have a pending redemption request.')
         return redirect('vouchers:detail', voucher_number=voucher_number)
 
     if request.method == 'POST':
@@ -123,24 +133,7 @@ def redeem_voucher(request, voucher_number):
             redemption = form.save(commit=False)
             redemption.voucher = voucher
             redemption.save()
-
-            from notifications.models import Notification
-            from django.contrib.auth.models import User as AuthUser
-            for admin in AuthUser.objects.filter(is_staff=True):
-                Notification.objects.create(
-                    user=admin,
-                    title='New Redemption Request',
-                    message=(
-                        f'User {request.user.username} submitted a redemption '
-                        f'request for voucher {voucher.voucher_number}.'
-                    ),
-                    notification_type='system',
-                )
-
-            messages.success(
-                request,
-                'Redemption request submitted! Our team will review it within 24–48 hours.'
-            )
+            messages.success(request, 'Redemption request submitted! Our team will review it within 24–48 hours.')
             return redirect('vouchers:detail', voucher_number=voucher_number)
     else:
         form = RedemptionForm()
