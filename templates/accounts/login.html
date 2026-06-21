@@ -45,6 +45,20 @@
     transition: all 0.3s;
 }
 .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(30,144,255,0.4); color: white; }
+.btn-eye {
+    background: #f0f4ff; border: 1.5px solid #e0e0e0;
+    border-left: none; border-radius: 0 10px 10px 0;
+    padding: 0 14px; cursor: pointer; color: #1E90FF;
+    transition: background 0.2s;
+}
+.btn-eye:hover { background: #dceeff; }
+.forgot-link {
+    color: #1E90FF; font-weight: 600; font-size: 0.88rem;
+    text-decoration: none; padding: 2px 8px;
+    background: #f0f4ff; border-radius: 6px;
+    transition: background 0.2s;
+}
+.forgot-link:hover { background: #dceeff; color: #0A2463; }
 .floating-bubbles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 0; }
 .bubble {
     position: absolute; bottom: -150px;
@@ -108,21 +122,23 @@
                             </div>
 
                             <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <label class="form-label fw-semibold">Password</label>
-                                    <a href="{% url 'password_reset' %}" class="small text-primary">Forgot Password?</a>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label fw-semibold mb-0">🔒 Password</label>
+                                    <a href="{% url 'password_reset' %}" class="forgot-link">
+                                        🔑 Forgot Password?
+                                    </a>
                                 </div>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0">
                                         <i class="bi bi-lock text-primary"></i>
                                     </span>
                                     <input type="password" name="password" id="id_password"
-                                           class="form-control border-start-0" placeholder="Enter password">
-                                    <button class="btn btn-outline-secondary border-start-0" type="button"
-                                            onclick="togglePassword()" style="border-left:none">
-                                        <i class="bi bi-eye" id="eyeIcon"></i>
+                                           class="form-control border-start-0" placeholder="Enter your password">
+                                    <button class="btn-eye" type="button" onclick="togglePassword()" title="Show/Hide Password">
+                                        <i class="bi bi-eye-fill" id="eyeIcon" style="font-size:1.1rem;"></i>
                                     </button>
                                 </div>
+                                <div class="text-muted" style="font-size:0.75rem; margin-top:4px;">👆 Click the eye icon to show/hide password</div>
                                 {% if form.non_field_errors %}
                                     <div class="text-danger small mt-1">{{ form.non_field_errors.0 }}</div>
                                 {% endif %}
