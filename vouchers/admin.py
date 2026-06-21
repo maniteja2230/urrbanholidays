@@ -78,9 +78,29 @@ class VoucherAdmin(admin.ModelAdmin):
 
     # ── Admin Actions ─────────────────────────────────────────────────
     def approve_payment(self, request, queryset):
-        """Approve Paytm payments — activate voucher + generate QR + coupon"""
+        """Approve Paytm payments — activate voucher + assign random reward + generate QR"""
+        from .models import assign_random_reward, get_cashback_amount
         count = 0
         for voucher in queryset.filter(status='pending_payment'):
+            # Assign random reward
+            reward = assign_random_reward()
+            voucher.reward_type = reward
+            if reward == 'cashback':
+                amount = get_cashback_amount()
+                voucher.reward_detail = f'₹{amount} Cashback'
+            elif reward == 'trip':
+                voucher.reward_detail = '500 Days Trip + Free Accommodation + Activities'
+            elif reward == 'wonderla':
+                voucher.reward_detail = 'Wonderla Theme Park Entry Ticket'
+            elif reward == 'gold':
+                voucher.reward_detail = 'Gold Gift (As per current rate)'
+            elif reward == 'silver':
+                voucher.reward_detail = 'Silver Gift (As per current rate)'
+            elif reward == 'boat_headset':
+                voucher.reward_detail = 'Premium Boat Headset'
+            elif reward == 'digital_watch':
+                voucher.reward_detail = 'Digital Watch'
+
             voucher.status = 'active'
             voucher.save()
 
@@ -95,23 +115,23 @@ class VoucherAdmin(admin.ModelAdmin):
                 Coupon.objects.create(voucher=voucher)
 
             # Notify user
+            reward_label = dict(voucher._meta.get_field('reward_type').choices).get(reward, reward)
             try:
                 from notifications.models import Notification
                 Notification.objects.create(
                     user=voucher.user,
-                    title='🎉 Payment Verified – Voucher Activated!',
+                    title='🎉 Payment Verified – Scratch Your Lucky Draw!',
                     message=(
-                        f'Your payment of ₹{voucher.amount} has been verified. '
-                        f'Your voucher #{voucher.voucher_number} is now ACTIVE! '
-                        f'Valid till {voucher.expiry_date.strftime("%d/%m/%Y")}.'
+                        f'Your payment of ₹{voucher.amount} has been verified! '
+                        f'Voucher #{voucher.voucher_number} is now ACTIVE. '
+                        f'Login to reveal your LUCKY DRAW reward! 🎊'
                     ),
                     notification_type='voucher',
                 )
             except Exception:
                 pass
-
             count += 1
-        self.message_user(request, f'✅ {count} voucher(s) approved and activated!')
+        self.message_user(request, f'✅ {count} voucher(s) approved with lucky draw rewards!')
     approve_payment.short_description = '✅ Approve & Activate (Paytm payment verified)'
 
     def reject_payment(self, request, queryset):

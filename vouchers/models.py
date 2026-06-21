@@ -1,7 +1,3 @@
-"""
-Vouchers app models – Voucher, Coupon, Redemption
-"""
-
 import uuid
 import string
 import random
@@ -9,6 +5,41 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.conf import settings
+
+
+# ── Reward System ─────────────────────────────────────────────────
+REWARD_CHOICES = [
+    ('cashback',        '💰 Cashback'),
+    ('wonderla',        '🎡 Wonderla Ticket'),
+    ('gold',            '🥇 Gold Gift'),
+    ('silver',          '🥈 Silver Gift'),
+    ('trip',            '✈️ Trip (500 Days + Free Accommodation + Activities)'),
+    ('boat_headset',    '🎧 Boat Headset'),
+    ('digital_watch',   '⌚ Digital Watch'),
+]
+
+# Weighted probability (higher = more common)
+REWARD_WEIGHTS = {
+    'cashback':       40,   # Most common
+    'boat_headset':   18,
+    'digital_watch':  18,
+    'wonderla':       10,
+    'silver':          8,
+    'gold':            4,
+    'trip':            2,   # Rarest
+}
+
+
+def assign_random_reward():
+    """Pick a random reward based on weighted probability"""
+    rewards  = list(REWARD_WEIGHTS.keys())
+    weights  = [REWARD_WEIGHTS[r] for r in rewards]
+    return random.choices(rewards, weights=weights, k=1)[0]
+
+
+def get_cashback_amount():
+    """Random cashback between ₹150 and ₹250 (multiples of 50)"""
+    return random.choice(range(150, 300, 50))  # 150, 200, 250
 
 
 def generate_voucher_number():
@@ -71,6 +102,21 @@ class Voucher(models.Model):
     payment_method = models.CharField(
         max_length=30, default='paytm_qr',
         help_text='paytm_qr / razorpay / manual'
+    )
+
+    # Lucky Draw Reward
+    reward_type = models.CharField(
+        max_length=30, choices=REWARD_CHOICES,
+        blank=True, default='',
+        help_text='Randomly assigned reward'
+    )
+    reward_detail = models.CharField(
+        max_length=200, blank=True,
+        help_text='Extra detail e.g. cashback amount'
+    )
+    reward_revealed = models.BooleanField(
+        default=False,
+        help_text='Has the user revealed/seen their reward?'
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

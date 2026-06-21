@@ -109,6 +109,17 @@ def voucher_detail(request, voucher_number):
 
 
 @login_required
+def reveal_reward(request, voucher_number):
+    """Mark reward as revealed when user taps scratch card"""
+    if request.method == 'POST':
+        voucher = get_object_or_404(Voucher, voucher_number=voucher_number, user=request.user)
+        if not voucher.reward_revealed and voucher.reward_type:
+            voucher.reward_revealed = True
+            voucher.save()
+    return redirect('vouchers:detail', voucher_number=voucher_number)
+
+
+@login_required
 def redeem_voucher(request, voucher_number):
     """Submit redemption request"""
     voucher = get_object_or_404(Voucher, voucher_number=voucher_number, user=request.user)

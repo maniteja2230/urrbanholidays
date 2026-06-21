@@ -3,6 +3,64 @@
 
 {% block title %}Voucher {{ voucher.voucher_number }} – Urban Holidays{% endblock %}
 
+{% block extra_css %}
+<style>
+/* ── Scratch Card ─────────────────────── */
+.scratch-wrapper {
+  background: linear-gradient(135deg, #0A2463, #1a3a6e);
+  border-radius: 20px; padding: 2rem;
+  text-align: center; margin-bottom: 1.5rem;
+  border: 2px solid #FFD700;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+.scratch-title { color: #FFD700; font-weight: 800; font-size: 1.2rem; margin-bottom: 1rem; }
+.scratch-card-container { position: relative; width: 260px; height: 130px; margin: 0 auto; cursor: pointer; }
+.scratch-cover {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+  border-radius: 14px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-size: 2rem; color: white;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.5s ease;
+  z-index: 2;
+  border: 3px dashed rgba(255,255,255,0.4);
+}
+.scratch-cover.revealed { opacity: 0; pointer-events: none; transform: scale(0.8) rotate(5deg); }
+.scratch-cover p { font-size: 0.75rem; margin: 0; opacity: 0.8; }
+.scratch-reward {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border-radius: 14px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 1;
+  animation: none;
+}
+.scratch-reward.show { animation: rewardPop 0.6s ease forwards; }
+@keyframes rewardPop {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.reward-icon { font-size: 2.5rem; line-height: 1; }
+.reward-name { font-size: 0.85rem; font-weight: 800; color: #0A2463; margin-top: 4px; }
+.reward-detail-text { font-size: 0.7rem; color: #333; margin: 0; }
+.confetti-btn {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #0A2463; font-weight: 800;
+  border: none; border-radius: 50px;
+  padding: 0.6rem 2rem; margin-top: 1rem;
+  font-size: 0.9rem; cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255,215,0,0.4);
+  transition: transform 0.2s;
+  display: none;
+}
+.confetti-btn:hover { transform: scale(1.05); }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="page-hero" style="min-height:250px;">
     <div class="container text-center">
@@ -41,6 +99,37 @@
                             <div style="font-size:3.5rem;font-weight:800;color:#FFD700;">₹{{ voucher.amount }}</div>
                         </div>
                     </div>
+
+                    <!-- ✅ Lucky Draw Scratch Card -->
+                    {% if voucher.reward_type %}
+                    <div class="scratch-wrapper">
+                      <div class="scratch-title">🎊 Your Lucky Draw Reward!</div>
+                      <div class="scratch-card-container" id="scratchCard" onclick="revealReward()">
+                        <div class="scratch-cover {% if voucher.reward_revealed %}revealed{% endif %}" id="scratchCover">
+                          <span>🎁</span>
+                          <p>Tap to Reveal!</p>
+                        </div>
+                        <div class="scratch-reward {% if voucher.reward_revealed %}show{% endif %}" id="scratchReward">
+                          {% if voucher.reward_type == 'cashback' %}<div class="reward-icon">💰</div><div class="reward-name">CASHBACK WON!</div>
+                          {% elif voucher.reward_type == 'wonderla' %}<div class="reward-icon">🎡</div><div class="reward-name">WONDERLA TICKET!</div>
+                          {% elif voucher.reward_type == 'gold' %}<div class="reward-icon">🥇</div><div class="reward-name">GOLD GIFT!</div>
+                          {% elif voucher.reward_type == 'silver' %}<div class="reward-icon">🥈</div><div class="reward-name">SILVER GIFT!</div>
+                          {% elif voucher.reward_type == 'trip' %}<div class="reward-icon">✈️</div><div class="reward-name">TRIP WON!</div>
+                          {% elif voucher.reward_type == 'boat_headset' %}<div class="reward-icon">🎧</div><div class="reward-name">BOAT HEADSET!</div>
+                          {% elif voucher.reward_type == 'digital_watch' %}<div class="reward-icon">⌚</div><div class="reward-name">DIGITAL WATCH!</div>
+                          {% endif %}
+                          <p class="reward-detail-text">{{ voucher.reward_detail }}</p>
+                        </div>
+                      </div>
+                      {% if voucher.reward_revealed %}
+                        <div style="color:#FFD700;font-weight:700;margin-top:1rem;">🎉 You Won: <strong>{{ voucher.reward_detail }}</strong></div>
+                        <div style="color:rgba(255,255,255,0.7);font-size:0.78rem;margin-top:4px;">Contact us to claim your reward!</div>
+                      {% else %}
+                        <button class="confetti-btn" id="confettiBtn" onclick="document.getElementById('revealForm').submit()">🎊 Claim My Reward!</button>
+                      {% endif %}
+                      <form id="revealForm" method="POST" action="{% url 'vouchers:reveal_reward' voucher.voucher_number %}" style="display:none">{% csrf_token %}</form>
+                    </div>
+                    {% endif %}
 
                     <!-- Voucher Body -->
                     <div style="background:#f8faff;padding:25px;">

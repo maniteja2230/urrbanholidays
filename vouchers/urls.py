@@ -1,7 +1,3 @@
-"""
-Vouchers app URL patterns
-"""
-
 from django.urls import path
 from . import views
 
@@ -14,4 +10,5 @@ urlpatterns = [
     path('detail/<str:voucher_number>/', views.voucher_detail, name='detail'),
     path('redeem/<str:voucher_number>/', views.redeem_voucher, name='redeem'),
     path('download/<str:voucher_number>/', views.download_voucher_pdf, name='download'),
+    path('reveal/<str:voucher_number>/', views.reveal_reward, name='reveal_reward'),
 ]
