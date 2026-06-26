@@ -29,7 +29,7 @@ class VoucherAdmin(admin.ModelAdmin):
         'created_at', 'screenshot_preview'
     ]
     inlines = [CouponInline]
-    actions = ['approve_payment', 'reject_payment', 'generate_qr_codes', 'mark_expired']
+    actions = ['approve_payment', 'reject_payment', 'generate_qr_codes', 'mark_expired', 'test_scratch_card']
 
     fieldsets = (
         ('Voucher Info', {
@@ -77,6 +77,51 @@ class VoucherAdmin(admin.ModelAdmin):
             )
         return 'No screenshot uploaded'
     screenshot_preview.short_description = 'Payment Screenshot'
+
+    # ── TEST SCRATCH CARD ────────────────────────────────────────────
+    def test_scratch_card(self, request, queryset):
+        """Admin test: assign random reward + reset reveal so you can test scratch card"""
+        from .models import assign_random_reward, get_cashback_amount
+        from django.http import HttpResponseRedirect
+        from django.urls import reverse
+
+        voucher = queryset.first()
+        if not voucher:
+            self.message_user(request, 'Select one voucher to test.', level='warning')
+            return
+
+        # Assign random reward
+        reward = assign_random_reward()
+        voucher.reward_type   = reward
+        voucher.reward_revealed = False   # reset so scratch shows
+        voucher.status        = 'active'
+
+        if reward == 'cashback':
+            voucher.reward_detail = f'₹{get_cashback_amount()} Cashback'
+        elif reward == 'trip':
+            voucher.reward_detail = '500 Days Trip + Free Accommodation + Activities'
+        elif reward == 'wonderla':
+            voucher.reward_detail = 'Wonderla Theme Park Entry Ticket'
+        elif reward == 'gold':
+            voucher.reward_detail = 'Gold Gift (As per current rate)'
+        elif reward == 'silver':
+            voucher.reward_detail = 'Silver Gift (As per current rate)'
+        elif reward == 'boat_headset':
+            voucher.reward_detail = 'Premium Boat Headset'
+        elif reward == 'digital_watch':
+            voucher.reward_detail = 'Digital Watch'
+
+        voucher.save()
+        self.message_user(
+            request,
+            f'🎮 Test scratch card set! Reward: {voucher.reward_detail}. '
+            f'Visit /vouchers/detail/{voucher.voucher_number}/ to scratch!'
+        )
+        # Redirect directly to the scratch card page
+        return HttpResponseRedirect(
+            f'/vouchers/detail/{voucher.voucher_number}/'
+        )
+    test_scratch_card.short_description = '🎮 Test Scratch Card (assign random reward)'
 
     # ── Admin Actions ─────────────────────────────────────────────────
     def approve_payment(self, request, queryset):
