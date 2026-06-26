@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Voucher {{ voucher.voucher_number }} – Urban Holidays{% endblock %}
+{% block title %}Membership {{ voucher.voucher_number }} – Urban Holidays{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -64,7 +64,7 @@
 {% block content %}
 <div class="page-hero" style="min-height:250px;">
     <div class="container text-center">
-        <h1 class="page-hero-title">My Voucher</h1>
+        <h1 class="page-hero-title">🏆 My Membership</h1>
         <p class="page-hero-subtitle">{{ voucher.voucher_number }}</p>
     </div>
 </div>
@@ -81,7 +81,7 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h4 class="fw-bold mb-1">✈ Urban Holidays</h4>
-                                <div class="small opacity-75">MEGA TICKET GIFT VOUCHER</div>
+                                <div class="small opacity-75">MEMBERSHIP PLAN</div>
                             </div>
                             <div class="text-end">
                                 {% if voucher.status == 'active' %}

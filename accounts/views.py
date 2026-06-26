@@ -12,6 +12,7 @@ from django.db import transaction
 
 from .forms import UserRegistrationForm, UserLoginForm, ProfileUpdateForm
 from .models import Profile, Referral
+from core.email_utils import send_welcome_email
 
 
 def register(request):
@@ -66,6 +67,13 @@ def register(request):
                 profile.save()
 
             login(request, user)
+
+            # Send welcome email
+            try:
+                send_welcome_email(user)
+            except Exception:
+                pass
+
             messages.success(
                 request,
                 f'Welcome to Urban Holidays, {user.first_name}! Your account has been created successfully.'

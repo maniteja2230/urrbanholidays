@@ -1,0 +1,14 @@
+🎉 Welcome to Urban Holidays, {{ name }}!
+
+Your account has been created successfully.
+
+Login at: https://urrbanholidays.in/accounts/login/
+
+Start your journey:
+→ Buy a Membership Plan (₹149 only!)
+→ Get a Lucky Draw scratch card reward
+→ Redeem for free trips, headsets, watches & more!
+
+See you on board! ✈️
+Team Urban Holidays
+https://urrbanholidays.in

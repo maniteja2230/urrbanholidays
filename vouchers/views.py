@@ -1,7 +1,3 @@
-"""
-Vouchers app views – Paytm QR payment flow + Voucher detail, Redeem, PDF
-"""
-
 import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -14,6 +10,13 @@ from datetime import timedelta
 from .models import Voucher, Coupon, Redemption
 from .forms import RedemptionForm
 from .utils import generate_voucher_pdf
+from core.email_utils import (
+    send_payment_received_email,
+    send_membership_activated_email,
+    send_membership_rejected_email,
+    send_redemption_approved_email,
+    send_redemption_rejected_email,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +74,12 @@ def buy_voucher(request):
                 )
         except Exception as e:
             logger.warning(f"Admin notification failed: {e}")
+
+        # Send payment received email
+        try:
+            send_payment_received_email(voucher)
+        except Exception as e:
+            logger.warning(f"Payment email failed: {e}")
 
         return redirect('vouchers:payment_pending', voucher_number=voucher.voucher_number)
 

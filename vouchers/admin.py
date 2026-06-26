@@ -1,11 +1,13 @@
-"""
-Vouchers app admin – with Paytm payment verification (approve/reject)
-"""
-
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
 from .models import Voucher, Coupon, Redemption
+from core.email_utils import (
+    send_membership_activated_email,
+    send_membership_rejected_email,
+    send_redemption_approved_email,
+    send_redemption_rejected_email,
+)
 
 
 class CouponInline(admin.StackedInline):
@@ -130,8 +132,13 @@ class VoucherAdmin(admin.ModelAdmin):
                 )
             except Exception:
                 pass
+            # Notify user via email
+            try:
+                send_membership_activated_email(voucher)
+            except Exception:
+                pass
             count += 1
-        self.message_user(request, f'✅ {count} voucher(s) approved with lucky draw rewards!')
+        self.message_user(request, f'✅ {count} membership(s) approved with lucky draw rewards!')
     approve_payment.short_description = '✅ Approve & Activate (Paytm payment verified)'
 
     def reject_payment(self, request, queryset):
@@ -155,8 +162,12 @@ class VoucherAdmin(admin.ModelAdmin):
             except Exception:
                 pass
 
+            try:
+                send_membership_rejected_email(voucher)
+            except Exception:
+                pass
             count += 1
-        self.message_user(request, f'❌ {count} voucher(s) rejected.')
+        self.message_user(request, f'❌ {count} membership(s) rejected.')
     reject_payment.short_description = '❌ Reject (Payment not verified)'
 
     def generate_qr_codes(self, request, queryset):
