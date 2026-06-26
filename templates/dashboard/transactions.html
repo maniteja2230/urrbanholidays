@@ -21,7 +21,7 @@
         </div>
         <nav class="sidebar-nav mt-3">
             <a href="{% url 'dashboard:index' %}"><i class="bi bi-speedometer2"></i>Dashboard</a>
-            <a href="{% url 'dashboard:my_vouchers' %}"><i class="bi bi-ticket-perforated"></i>My Vouchers</a>
+            <a href="{% url 'dashboard:my_vouchers' %}"><i class="bi bi-ticket-perforated"></i>My Memberships</a>
             <a href="{% url 'packages:list' %}"><i class="bi bi-map"></i>Packages</a>
             <a href="{% url 'accounts:profile' %}"><i class="bi bi-person-gear"></i>Profile</a>
             <a href="{% url 'dashboard:transactions' %}" class="active"><i class="bi bi-clock-history"></i>Transactions</a>
@@ -92,7 +92,7 @@
                     <i class="bi bi-receipt fs-1 d-block mb-3"></i>
                     <h5>No transactions yet</h5>
                     <p>Buy your first voucher to see transactions here.</p>
-                    <a href="{% url 'vouchers:buy' %}" class="btn btn-primary">Buy Voucher</a>
+                    <a href="{% url 'vouchers:buy' %}" class="btn btn-primary">Buy Membership</a>
                 </div>
                 {% endif %}
             </div>

@@ -2,7 +2,7 @@
 {% load static %}
 {% load humanize %}
 
-{% block title %}Urban Holidays – Premium Travel Vouchers & Packages{% endblock %}
+{% block title %}Urban Holidays – Membership Plans & Packages{% endblock %}
 
 {% block content %}
 <!-- ═══ HERO SECTION ══════════════════════════════════════════════════════ -->
@@ -26,9 +26,9 @@
                     <span class="text-warning">Urban Holidays</span>
                 </h1>
                 <p class="hero-subtitle">
-                    Buy your Mega Ticket Gift Voucher for just <strong>₹{{ voucher_price }}</strong> and unlock
+                    Get your <strong>Membership Plan for just ₹{{ voucher_price }}</strong> and unlock
                     access to exclusive travel packages across India's most beautiful destinations.
-                    QR-coded, digital, downloadable.
+                    Includes a <strong>Lucky Draw scratch card</strong> reward! 🎉
                 </p>
 
                 <div class="hero-features d-flex flex-wrap gap-3 mb-5">
@@ -52,7 +52,7 @@
 
                 <div class="d-flex gap-3 flex-wrap">
                     <a href="{% url 'vouchers:buy' %}" class="btn btn-hero-primary">
-                        <i class="bi bi-ticket-perforated me-2"></i>Buy Voucher @ ₹{{ voucher_price }}
+                        <i class="bi bi-ticket-perforated me-2"></i>Buy Membership @ ₹{{ voucher_price }}
                     </a>
                     <a href="{% url 'packages:list' %}" class="btn btn-hero-outline">
                         <i class="bi bi-map me-2"></i>Explore Packages
@@ -66,7 +66,7 @@
                     <div class="voucher-card-inner">
                         <div class="vc-header">
                             <div class="vc-logo">✈ URBAN HOLIDAYS</div>
-                            <div class="vc-tag">MEGA TICKET GIFT VOUCHER</div>
+                            <div class="vc-tag">MEMBERSHIP PLAN</div>
                         </div>
                         <div class="vc-amount">₹{{ voucher_price }}</div>
                         <div class="vc-body">
@@ -119,7 +119,7 @@
             <div class="stat-divider"></div>
             <div class="stat-item">
                 <span class="stat-number">₹{{ voucher_price }}</span>
-                <span class="stat-label">Voucher Price</span>
+                <span class="stat-label">Membership Price</span>
             </div>
         </div>
     </div>
@@ -145,15 +145,15 @@
                         {% else %}✈{% endif %}
                     </div>
                     <h5 class="step-title">
-                        {% if forloop.counter == 1 %}Choose Voucher
+                        {% if forloop.counter == 1 %}Choose Membership
                         {% elif forloop.counter == 2 %}Pay ₹{{ voucher_price }}
                         {% elif forloop.counter == 3 %}Get Your Code
                         {% else %}Travel & Enjoy{% endif %}
                     </h5>
                     <p class="step-desc text-muted small">
-                        {% if forloop.counter == 1 %}Select the Urban Holidays Mega Ticket Gift Voucher.
+                        {% if forloop.counter == 1 %}Select the Urban Holidays Membership Plan.
                         {% elif forloop.counter == 2 %}Pay securely via Razorpay – UPI, cards, netbanking.
-                        {% elif forloop.counter == 3 %}Receive digital voucher with QR code instantly.
+                        {% elif forloop.counter == 3 %}Receive membership plan with QR code instantly.
                         {% else %}Submit redemption request and enjoy your trip!{% endif %}
                     </p>
                 </div>
@@ -187,7 +187,7 @@
                         <div class="package-badge">{{ package.get_category_display }}</div>
                         {% if package.is_voucher_applicable %}
                         <div class="voucher-badge">
-                            <i class="bi bi-ticket-perforated me-1"></i>Voucher Valid
+                            <i class="bi bi-ticket-perforated me-1"></i>Membership Valid
                         </div>
                         {% endif %}
                     </div>
@@ -241,12 +241,12 @@
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <div class="cta-icon">🎟️</div>
                         <div>
-                            <h2 class="fw-bold text-white mb-1">Get Your Mega Ticket Voucher</h2>
+                            <h2 class="fw-bold text-white mb-1">Get Your Membership Plan</h2>
                             <p class="text-white-50 mb-0">One voucher. Endless possibilities. Valid for 365 days.</p>
                         </div>
                     </div>
                     <div class="cta-features d-flex flex-wrap gap-3 mt-4">
-                        <span class="cta-feature"><i class="bi bi-check-circle-fill me-2"></i>Digital QR Voucher</span>
+                        <span class="cta-feature"><i class="bi bi-check-circle-fill me-2"></i>Digital Membership Card</span>
                         <span class="cta-feature"><i class="bi bi-check-circle-fill me-2"></i>Instant Delivery</span>
                         <span class="cta-feature"><i class="bi bi-check-circle-fill me-2"></i>Redeemable Anytime</span>
                         <span class="cta-feature"><i class="bi bi-check-circle-fill me-2"></i>PDF Download</span>
@@ -321,12 +321,12 @@
                     <div class="accordion-item border-0 mb-2">
                         <h2 class="accordion-header">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                What is the Urban Holidays Mega Ticket Voucher?
+                                What is the Urban Holidays Membership Plan?
                             </button>
                         </h2>
                         <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                             <div class="accordion-body text-muted">
-                                The Urban Holidays Mega Ticket Gift Voucher is a ₹{{ voucher_price }} digital voucher that gives you access to exclusive travel packages and deals offered by Urban Holidays.
+                                The Urban Holidays Membership Plan is a ₹{{ voucher_price }} membership plan that gives you access to exclusive travel packages and deals offered by Urban Holidays.
                             </div>
                         </div>
                     </div>
@@ -338,7 +338,7 @@
                         </h2>
                         <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                             <div class="accordion-body text-muted">
-                                After purchase, go to your Dashboard → My Vouchers → Click on your voucher → Submit Redemption Request. Our team will process it within 24–48 hours.
+                                After purchase, go to your Dashboard → My Memberships → Click on your voucher → Submit Redemption Request. Our team will process it within 24–48 hours.
                             </div>
                         </div>
                     </div>

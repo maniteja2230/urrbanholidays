@@ -110,7 +110,7 @@
                 <i class="bi bi-speedometer2"></i>Dashboard
             </a>
             <a href="{% url 'dashboard:my_vouchers' %}" class="{% if request.resolver_match.url_name == 'my_vouchers' %}active{% endif %}">
-                <i class="bi bi-ticket-perforated"></i>My Vouchers
+                <i class="bi bi-ticket-perforated"></i>My Memberships
                 <span class="ms-auto badge bg-primary">{{ active_vouchers }}</span>
             </a>
             <a href="{% url 'packages:list' %}">
@@ -137,7 +137,7 @@
 
             <div class="nav-group">Quick Actions</div>
             <a href="{% url 'vouchers:buy' %}">
-                <i class="bi bi-cart-plus"></i>Buy Voucher
+                <i class="bi bi-cart-plus"></i>Buy Membership
             </a>
             <a href="{% url 'core:contact' %}">
                 <i class="bi bi-headset"></i>Support
@@ -159,7 +159,7 @@
                 <p class="text-muted mb-0 small">Here's your travel dashboard overview.</p>
             </div>
             <a href="{% url 'vouchers:buy' %}" class="btn btn-primary d-none d-md-inline-flex">
-                <i class="bi bi-plus-circle me-2"></i>Buy Voucher
+                <i class="bi bi-plus-circle me-2"></i>Buy Membership
             </a>
         </div>
 
@@ -169,14 +169,14 @@
                 <div class="stat-card-dash">
                     <div class="stat-icon mb-2">🎟️</div>
                     <div class="stat-value">{{ total_vouchers }}</div>
-                    <div class="stat-name">Total Vouchers</div>
+                    <div class="stat-name">Total Memberships</div>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="stat-card-dash" style="background:linear-gradient(135deg,#28A745,#20C997);">
                     <div class="stat-icon mb-2">✅</div>
                     <div class="stat-value">{{ active_vouchers }}</div>
-                    <div class="stat-name">Active Vouchers</div>
+                    <div class="stat-name">Active Memberships</div>
                 </div>
             </div>
             <div class="col-md-3 col-6">
@@ -235,7 +235,7 @@
                     {% else %}
                         <div class="text-center text-muted py-4">
                             <i class="bi bi-receipt fs-2 d-block mb-2"></i>No transactions yet.
-                            <div class="mt-2"><a href="{% url 'vouchers:buy' %}" class="btn btn-primary btn-sm">Buy Your First Voucher</a></div>
+                            <div class="mt-2"><a href="{% url 'vouchers:buy' %}" class="btn btn-primary btn-sm">Buy Your First Membership</a></div>
                         </div>
                     {% endif %}
                 </div>

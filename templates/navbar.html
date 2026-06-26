@@ -9,7 +9,7 @@
             <div class="brand-icon">✈</div>
             <div>
                 <span class="brand-name">Urban<span class="text-warning">Holidays</span></span>
-                <div class="brand-tagline">Premium Travel Vouchers</div>
+                <div class="brand-tagline">Membership Plans</div>
             </div>
         </a>
 
@@ -56,9 +56,9 @@
 
             <!-- Right Side Actions -->
             <div class="d-flex align-items-center gap-2">
-                <!-- Buy Voucher CTA -->
+                <!-- Buy Membership CTA -->
                 <a href="{% url 'vouchers:buy' %}" class="btn btn-voucher d-none d-lg-inline-flex">
-                    <i class="bi bi-ticket-perforated me-1"></i>Buy ₹{{ VOUCHER_PRICE }} Voucher
+                    <i class="bi bi-award me-1"></i>Buy Membership @ ₹{{ VOUCHER_PRICE }}
                 </a>
 
                 {% if user.is_authenticated %}
@@ -101,7 +101,7 @@
                             </li>
                             <li>
                                 <a class="dropdown-item py-2" href="{% url 'dashboard:my_vouchers' %}">
-                                    <i class="bi bi-ticket-perforated me-2 text-primary"></i>My Vouchers
+                                    <i class="bi bi-ticket-perforated me-2 text-primary"></i>My Memberships
                                 </a>
                             </li>
                             <li>

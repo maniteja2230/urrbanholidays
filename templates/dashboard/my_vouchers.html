@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}My Vouchers – Urban Holidays{% endblock %}
+{% block title %}My Memberships – Urban Holidays{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -26,21 +26,21 @@
         </div>
         <nav class="sidebar-nav mt-3">
             <a href="{% url 'dashboard:index' %}"><i class="bi bi-speedometer2"></i>Dashboard</a>
-            <a href="{% url 'dashboard:my_vouchers' %}" class="active"><i class="bi bi-ticket-perforated"></i>My Vouchers</a>
+            <a href="{% url 'dashboard:my_vouchers' %}" class="active"><i class="bi bi-ticket-perforated"></i>My Memberships</a>
             <a href="{% url 'packages:list' %}"><i class="bi bi-map"></i>Packages</a>
             <a href="{% url 'accounts:profile' %}"><i class="bi bi-person-gear"></i>Profile</a>
             <a href="{% url 'dashboard:transactions' %}"><i class="bi bi-clock-history"></i>Transactions</a>
             <a href="{% url 'dashboard:referrals' %}"><i class="bi bi-people"></i>Referrals</a>
             <a href="{% url 'notifications:list' %}"><i class="bi bi-bell"></i>Notifications</a>
-            <a href="{% url 'vouchers:buy' %}"><i class="bi bi-cart-plus"></i>Buy Voucher</a>
+            <a href="{% url 'vouchers:buy' %}"><i class="bi bi-cart-plus"></i>Buy Membership</a>
         </nav>
     </div>
 
     <div class="dashboard-content">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h4 class="fw-bold mb-0" style="color:#0A2463">My Vouchers</h4>
+            <h4 class="fw-bold mb-0" style="color:#0A2463">My Memberships</h4>
             <a href="{% url 'vouchers:buy' %}" class="btn btn-primary">
-                <i class="bi bi-plus me-1"></i>Buy More Vouchers
+                <i class="bi bi-plus me-1"></i>Buy More Memberships
             </a>
         </div>
 
@@ -79,7 +79,7 @@
                     </div>
                     <div class="vc-body-mini">
                         <div class="d-flex justify-content-between small mb-2">
-                            <span class="text-muted">Voucher No.</span>
+                            <span class="text-muted">Membership No.</span>
                             <span class="fw-semibold" style="font-size:0.8rem;">{{ voucher.voucher_number }}</span>
                         </div>
                         {% if voucher.coupon %}
@@ -122,10 +122,10 @@
         {% else %}
         <div class="text-center py-5" data-aos="fade-up">
             <div style="font-size:5rem;">🎟️</div>
-            <h4 class="mt-3 fw-bold">No Vouchers Yet</h4>
+            <h4 class="mt-3 fw-bold">No Memberships Yet</h4>
             <p class="text-muted">Purchase your first Urban Holidays voucher to get started!</p>
             <a href="{% url 'vouchers:buy' %}" class="btn btn-primary btn-lg mt-2">
-                <i class="bi bi-cart-plus me-2"></i>Buy Voucher @ ₹{{ VOUCHER_PRICE }}
+                <i class="bi bi-cart-plus me-2"></i>Buy Membership @ ₹{{ VOUCHER_PRICE }}
             </a>
         </div>
         {% endif %}
