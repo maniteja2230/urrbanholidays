@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 <style>
-/* ── Scratch Card ─────────────────────── */
+/* ── Scratch Card (GPay style) ──────────────────── */
 .scratch-wrapper {
   background: linear-gradient(135deg, #0A2463, #1a3a6e);
   border-radius: 20px; padding: 2rem;
@@ -13,51 +13,79 @@
   border: 2px solid #FFD700;
   box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
-.scratch-title { color: #FFD700; font-weight: 800; font-size: 1.2rem; margin-bottom: 1rem; }
-.scratch-card-container { position: relative; width: 260px; height: 130px; margin: 0 auto; cursor: pointer; }
-.scratch-cover {
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
-  border-radius: 14px;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  font-size: 2rem; color: white;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  transition: all 0.5s ease;
-  z-index: 2;
-  border: 3px dashed rgba(255,255,255,0.4);
+.scratch-title { color: #FFD700; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.scratch-hint  { color: rgba(255,255,255,0.6); font-size: 0.78rem; margin-bottom: 1rem; }
+
+/* The card container */
+.scratch-card-wrap {
+  position: relative;
+  width: 280px; height: 160px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
-.scratch-cover.revealed { opacity: 0; pointer-events: none; transform: scale(0.8) rotate(5deg); }
-.scratch-cover p { font-size: 0.75rem; margin: 0; opacity: 0.8; }
-.scratch-reward {
+
+/* Reward shown BEHIND the canvas */
+.scratch-reward-bg {
   position: absolute; inset: 0;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  border-radius: 14px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
+  border-radius: 16px;
   z-index: 1;
-  animation: none;
 }
-.scratch-reward.show { animation: rewardPop 0.6s ease forwards; }
-@keyframes rewardPop {
-  0%   { transform: scale(0); opacity: 0; }
-  60%  { transform: scale(1.1); }
-  100% { transform: scale(1); opacity: 1; }
+.reward-icon-big { font-size: 3rem; line-height: 1.1; }
+.reward-name-big { font-size: 1rem; font-weight: 900; color: #0A2463; margin-top: 4px; }
+.reward-sub      { font-size: 0.72rem; color: #333; margin-top: 2px; }
+
+/* Canvas sits ON TOP */
+#scratchCanvas {
+  position: absolute; inset: 0;
+  border-radius: 16px;
+  z-index: 2;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23FFD700' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 16 16, crosshair;
+  touch-action: none;
 }
-.reward-icon { font-size: 2.5rem; line-height: 1; }
-.reward-name { font-size: 0.85rem; font-weight: 800; color: #0A2463; margin-top: 4px; }
-.reward-detail-text { font-size: 0.7rem; color: #333; margin: 0; }
-.confetti-btn {
+
+/* Shimmer on the cover */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.scratch-progress-bar {
+  height: 4px; border-radius: 4px;
+  background: rgba(255,255,255,0.15);
+  margin: 0.75rem auto 0; width: 280px;
+  overflow: hidden;
+}
+.scratch-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  border-radius: 4px;
+  transition: width 0.2s;
+  width: 0%;
+}
+
+.reward-revealed-box {
+  margin-top: 1rem;
+  animation: popIn 0.5s cubic-bezier(.36,1.56,.64,1) both;
+}
+@keyframes popIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.claim-btn {
   background: linear-gradient(135deg, #FFD700, #FFA500);
   color: #0A2463; font-weight: 800;
   border: none; border-radius: 50px;
-  padding: 0.6rem 2rem; margin-top: 1rem;
-  font-size: 0.9rem; cursor: pointer;
-  box-shadow: 0 4px 15px rgba(255,215,0,0.4);
+  padding: 0.65rem 2rem; margin-top: 0.75rem;
+  font-size: 0.95rem; cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255,215,0,0.5);
   transition: transform 0.2s;
-  display: none;
 }
-.confetti-btn:hover { transform: scale(1.05); }
+.claim-btn:hover { transform: scale(1.07); }
 </style>
 {% endblock %}
 
@@ -100,34 +128,58 @@
                         </div>
                     </div>
 
-                    <!-- ✅ Lucky Draw Scratch Card -->
+                    <!-- ✅ GPay-Style Scratch Card -->
                     {% if voucher.reward_type %}
                     <div class="scratch-wrapper">
-                      <div class="scratch-title">🎊 Your Lucky Draw Reward!</div>
-                      <div class="scratch-card-container" id="scratchCard" onclick="revealReward()">
-                        <div class="scratch-cover {% if voucher.reward_revealed %}revealed{% endif %}" id="scratchCover">
-                          <span>🎁</span>
-                          <p>Tap to Reveal!</p>
-                        </div>
-                        <div class="scratch-reward {% if voucher.reward_revealed %}show{% endif %}" id="scratchReward">
-                          {% if voucher.reward_type == 'cashback' %}<div class="reward-icon">💰</div><div class="reward-name">CASHBACK WON!</div>
-                          {% elif voucher.reward_type == 'wonderla' %}<div class="reward-icon">🎡</div><div class="reward-name">WONDERLA TICKET!</div>
-                          {% elif voucher.reward_type == 'gold' %}<div class="reward-icon">🥇</div><div class="reward-name">GOLD GIFT!</div>
-                          {% elif voucher.reward_type == 'silver' %}<div class="reward-icon">🥈</div><div class="reward-name">SILVER GIFT!</div>
-                          {% elif voucher.reward_type == 'trip' %}<div class="reward-icon">✈️</div><div class="reward-name">TRIP WON!</div>
-                          {% elif voucher.reward_type == 'boat_headset' %}<div class="reward-icon">🎧</div><div class="reward-name">BOAT HEADSET!</div>
-                          {% elif voucher.reward_type == 'digital_watch' %}<div class="reward-icon">⌚</div><div class="reward-name">DIGITAL WATCH!</div>
-                          {% endif %}
-                          <p class="reward-detail-text">{{ voucher.reward_detail }}</p>
-                        </div>
-                      </div>
+                      <div class="scratch-title">🎉 Your Lucky Draw Reward!</div>
+
                       {% if voucher.reward_revealed %}
-                        <div style="color:#FFD700;font-weight:700;margin-top:1rem;">🎉 You Won: <strong>{{ voucher.reward_detail }}</strong></div>
-                        <div style="color:rgba(255,255,255,0.7);font-size:0.78rem;margin-top:4px;">Contact us to claim your reward!</div>
+                        <!-- Already revealed — show reward directly -->
+                        <div class="reward-revealed-box">
+                          <div style="font-size:3.5rem;">
+                            {% if voucher.reward_type == 'cashback' %}💰
+                            {% elif voucher.reward_type == 'wonderla' %}🎡
+                            {% elif voucher.reward_type == 'gold' %}🥇
+                            {% elif voucher.reward_type == 'silver' %}🥈
+                            {% elif voucher.reward_type == 'trip' %}✈️
+                            {% elif voucher.reward_type == 'boat_headset' %}🎧
+                            {% elif voucher.reward_type == 'digital_watch' %}⌚
+                            {% endif %}
+                          </div>
+                          <div style="color:#FFD700;font-weight:800;font-size:1.1rem;margin-top:6px;">You Won!</div>
+                          <div style="color:white;font-weight:700;font-size:1rem;">{{ voucher.reward_detail }}</div>
+                          <div style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-top:6px;">📞 Contact us to claim: support@urrbanholidays.in</div>
+                        </div>
+
                       {% else %}
-                        <button class="confetti-btn" id="confettiBtn" onclick="document.getElementById('revealForm').submit()">🎊 Claim My Reward!</button>
+                        <!-- Scratch to reveal -->
+                        <div class="scratch-hint">👆 Use your finger or mouse to scratch!</div>
+
+                        <div class="scratch-card-wrap">
+                          <!-- Reward behind canvas -->
+                          <div class="scratch-reward-bg">
+                            {% if voucher.reward_type == 'cashback' %}<div class="reward-icon-big">💰</div><div class="reward-name-big">CASHBACK WON!</div>
+                            {% elif voucher.reward_type == 'wonderla' %}<div class="reward-icon-big">🎡</div><div class="reward-name-big">WONDERLA TICKET!</div>
+                            {% elif voucher.reward_type == 'gold' %}<div class="reward-icon-big">🥇</div><div class="reward-name-big">GOLD GIFT!</div>
+                            {% elif voucher.reward_type == 'silver' %}<div class="reward-icon-big">🥈</div><div class="reward-name-big">SILVER GIFT!</div>
+                            {% elif voucher.reward_type == 'trip' %}<div class="reward-icon-big">✈️</div><div class="reward-name-big">FREE TRIP WON!</div>
+                            {% elif voucher.reward_type == 'boat_headset' %}<div class="reward-icon-big">🎧</div><div class="reward-name-big">BOAT HEADSET!</div>
+                            {% elif voucher.reward_type == 'digital_watch' %}<div class="reward-icon-big">⌚</div><div class="reward-name-big">DIGITAL WATCH!</div>
+                            {% endif %}
+                            <div class="reward-sub">{{ voucher.reward_detail }}</div>
+                          </div>
+                          <!-- Canvas scratch layer -->
+                          <canvas id="scratchCanvas" width="280" height="160"></canvas>
+                        </div>
+
+                        <!-- Progress bar -->
+                        <div class="scratch-progress-bar">
+                          <div class="scratch-progress-fill" id="progressFill"></div>
+                        </div>
+                        <div style="color:rgba(255,255,255,0.5);font-size:0.72rem;margin-top:4px;" id="progressText">Scratch to reveal your reward!</div>
+
+                        <form id="revealForm" method="POST" action="{% url 'vouchers:reveal_reward' voucher.voucher_number %}" style="display:none">{% csrf_token %}</form>
                       {% endif %}
-                      <form id="revealForm" method="POST" action="{% url 'vouchers:reveal_reward' voucher.voucher_number %}" style="display:none">{% csrf_token %}</form>
                     </div>
                     {% endif %}
 
@@ -241,16 +293,140 @@
                             </div>
                             {% endif %}
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="text-center text-muted py-4">
-                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                            No redemption requests yet.
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
+                         {% endfor %}
+                     {% else %}
+                         <div class="text-center text-muted py-4">
+                             <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                             No redemption requests yet.
+                         </div>
+                     {% endif %}
+                 </div>
+             </div>
+         </div>
+     </div>
 </section>
+
+{% block extra_js %}
+{% if voucher.reward_type and not voucher.reward_revealed %}
+<script>
+(function() {
+  const canvas  = document.getElementById('scratchCanvas');
+  if (!canvas) return;
+  const ctx     = canvas.getContext('2d');
+  const W       = canvas.width;
+  const H       = canvas.height;
+  let isDrawing = false;
+  let revealed  = false;
+
+  /* ── Draw the silver scratch cover ───────────────────────── */
+  function drawCover() {
+    // Silver gradient
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0,   '#D4D4D4');
+    grad.addColorStop(0.3, '#BDBDBD');
+    grad.addColorStop(0.6, '#C8C8C8');
+    grad.addColorStop(1,   '#A8A8A8');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Shimmer lines
+    ctx.globalAlpha = 0.18;
+    for (let i = 0; i < W; i += 18) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0); ctx.lineTo(i + 10, H);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 6;
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // Center text
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.font = 'bold 22px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🎁 Scratch Here!', W / 2, H / 2 - 6);
+    ctx.font = '13px sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.65)';
+    ctx.fillText('Use finger or mouse', W / 2, H / 2 + 18);
+
+    // Urban Holidays watermark
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText('✈ Urban Holidays', W / 2, H - 12);
+  }
+
+  drawCover();
+
+  /* ── Scratch effect ───────────────────────────────────────── */
+  function scratch(x, y) {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 28, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+    updateProgress();
+  }
+
+  /* ── Progress calculation ─────────────────────────────────── */
+  function updateProgress() {
+    const data    = ctx.getImageData(0, 0, W, H).data;
+    let cleared   = 0;
+    for (let i = 3; i < data.length; i += 4) {
+      if (data[i] === 0) cleared++;
+    }
+    const pct = Math.round((cleared / (W * H)) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+
+    if (pct < 30) {
+      document.getElementById('progressText').textContent = 'Keep scratching... ' + pct + '%';
+    } else if (pct < 60) {
+      document.getElementById('progressText').textContent = 'Almost there! ' + pct + '%';
+    } else {
+      document.getElementById('progressText').textContent = '🎉 ' + pct + '% scratched!';
+    }
+
+    if (pct >= 60 && !revealed) {
+      revealed = true;
+      autoReveal();
+    }
+  }
+
+  /* ── Auto reveal at 60% ───────────────────────────────────── */
+  function autoReveal() {
+    ctx.clearRect(0, 0, W, H);   // clear remaining cover
+    setTimeout(() => {
+      document.getElementById('revealForm').submit();
+    }, 800);
+  }
+
+  /* ── Get position helper ──────────────────────────────────── */
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W / rect.width;
+    const scaleY = H / rect.height;
+    if (e.touches) {
+      return {
+        x: (e.touches[0].clientX - rect.left) * scaleX,
+        y: (e.touches[0].clientY - rect.top)  * scaleY
+      };
+    }
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top)  * scaleY
+    };
+  }
+
+  /* ── Mouse events ─────────────────────────────────────────── */
+  canvas.addEventListener('mousedown', e => { isDrawing = true; const p = getPos(e); scratch(p.x, p.y); });
+  canvas.addEventListener('mousemove', e => { if (!isDrawing) return; const p = getPos(e); scratch(p.x, p.y); });
+  canvas.addEventListener('mouseup',   () => isDrawing = false);
+  canvas.addEventListener('mouseleave',() => isDrawing = false);
+
+  /* ── Touch events (mobile) ────────────────────────────────── */
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); isDrawing = true; const p = getPos(e); scratch(p.x, p.y); }, { passive: false });
+  canvas.addEventListener('touchmove',  e => { e.preventDefault(); if (!isDrawing) return; const p = getPos(e); scratch(p.x, p.y); }, { passive: false });
+  canvas.addEventListener('touchend',   () => isDrawing = false);
+})();
+</script>
+{% endif %}
 {% endblock %}
