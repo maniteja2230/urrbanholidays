@@ -9,37 +9,60 @@ from django.conf import settings
 
 # ── Reward System ─────────────────────────────────────────────────
 REWARD_CHOICES = [
-    ('cashback',        '💰 Cashback'),
-    ('wonderla',        '🎡 Wonderla Ticket'),
-    ('gold',            '🥇 Gold Gift'),
-    ('silver',          '🥈 Silver Gift'),
-    ('trip',            '✈️ Trip (500 Days + Free Accommodation + Activities)'),
-    ('boat_headset',    '🎧 Boat Headset'),
-    ('digital_watch',   '⌚ Digital Watch'),
+    ('off_100',         '💰 ₹100 Off on Your Next Trip'),
+    ('off_200',         '💰 ₹200 Off on Your Next Trip'),
+    ('off_500',         '💰 ₹500 Off on Your Next Trip'),
+    ('off_2000',        '💰 ₹2000 Off on Your Next Trip'),
+    ('wonderla',        '🎡 Wonderla Tickets'),
+    ('accommodation',   '🏨 Accommodation Free on Your Next Trip'),
+    ('journey',         '🎫 Journey Tickets Free on Your Next Trip'),
+    ('silver',          '🥈 You Got 10gm of Silver'),
+    ('gold',            '🥇 You Won 1 Gram Gold'),
 ]
 
-# Weighted probability (higher = more common)
+# Weighted probability (matches user-defined %)
 REWARD_WEIGHTS = {
-    'cashback':       40,   # Most common
-    'boat_headset':   18,
-    'digital_watch':  18,
+    'off_100':        19,
+    'off_200':        10,
+    'off_500':        40,   # Most common
+    'off_2000':        5,
     'wonderla':       10,
-    'silver':          8,
-    'gold':            4,
-    'trip':            2,   # Rarest
+    'accommodation':  10,
+    'journey':         5,
+    'silver':          1,   # Lucky Winner
+    'gold':            1,   # Lucky Winner
 }
+
+# Rewards that show "Lucky Winner" label
+LUCKY_WINNER_REWARDS = {'silver', 'gold'}
 
 
 def assign_random_reward():
     """Pick a random reward based on weighted probability"""
-    rewards  = list(REWARD_WEIGHTS.keys())
-    weights  = [REWARD_WEIGHTS[r] for r in rewards]
+    rewards = list(REWARD_WEIGHTS.keys())
+    weights = [REWARD_WEIGHTS[r] for r in rewards]
     return random.choices(rewards, weights=weights, k=1)[0]
 
 
-def get_cashback_amount():
-    """Random cashback between ₹150 and ₹250 (multiples of 50)"""
-    return random.choice(range(150, 300, 50))  # 150, 200, 250
+def is_lucky_winner(reward_type):
+    """Returns True if this reward shows the LUCKY WINNER banner"""
+    return reward_type in LUCKY_WINNER_REWARDS
+
+
+def get_reward_detail(reward_type):
+    """Return the display text for a given reward type"""
+    details = {
+        'off_100':       '₹100 Off on Your Next Trip',
+        'off_200':       '₹200 Off on Your Next Trip',
+        'off_500':       '₹500 Off on Your Next Trip',
+        'off_2000':      '₹2000 Off on Your Next Trip',
+        'wonderla':      'Wonderla Theme Park Entry Ticket',
+        'accommodation': 'Accommodation Free on Your Next Trip',
+        'journey':       'Journey Tickets Free on Your Next Trip',
+        'silver':        'You Got 10gm of Silver 🥈',
+        'gold':          'You Won 1 Gram Gold 🥇',
+    }
+    return details.get(reward_type, 'Special Reward')
 
 
 def generate_voucher_number():

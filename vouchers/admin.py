@@ -81,7 +81,7 @@ class VoucherAdmin(admin.ModelAdmin):
     # ── TEST SCRATCH CARD ────────────────────────────────────────────
     def test_scratch_card(self, request, queryset):
         """Admin test: assign random reward + reset reveal so you can test scratch card"""
-        from .models import assign_random_reward, get_cashback_amount
+        from .models import assign_random_reward, get_reward_detail
         from django.http import HttpResponseRedirect
         from django.urls import reverse
 
@@ -90,26 +90,31 @@ class VoucherAdmin(admin.ModelAdmin):
             self.message_user(request, 'Select one voucher to test.', level='warning')
             return
 
+        def is_lucky_winner(reward_type):
+            """Returns True if this reward shows the LUCKY WINNER banner"""
+            return reward_type in ['gold', 'silver']
+
+        def get_reward_detail(reward_type):
+            """Return the display text for a given reward type"""
+            details = {
+                'off_100':       '₹100 Off on Your Next Trip',
+                'off_200':       '₹200 Off on Your Next Trip',
+                'off_500':       '₹500 Off on Your Next Trip',
+                'off_2000':      '₹2000 Off on Your Next Trip',
+                'wonderla':      'Wonderla Theme Park Entry Ticket',
+                'accommodation': 'Accommodation Free on Your Next Trip',
+                'journey':       'Journey Tickets Free on Your Next Trip',
+                'silver':        'You Got 10gm of Silver 🥈',
+                'gold':          'You Won 1 Gram Gold 🥇',
+            }
+            return details.get(reward_type, 'Special Reward')
+
         # Assign random reward
         reward = assign_random_reward()
         voucher.reward_type   = reward
         voucher.reward_revealed = False   # reset so scratch shows
         voucher.status        = 'active'
-
-        if reward == 'cashback':
-            voucher.reward_detail = f'₹{get_cashback_amount()} Cashback'
-        elif reward == 'trip':
-            voucher.reward_detail = '500 Days Trip + Free Accommodation + Activities'
-        elif reward == 'wonderla':
-            voucher.reward_detail = 'Wonderla Theme Park Entry Ticket'
-        elif reward == 'gold':
-            voucher.reward_detail = 'Gold Gift (As per current rate)'
-        elif reward == 'silver':
-            voucher.reward_detail = 'Silver Gift (As per current rate)'
-        elif reward == 'boat_headset':
-            voucher.reward_detail = 'Premium Boat Headset'
-        elif reward == 'digital_watch':
-            voucher.reward_detail = 'Digital Watch'
+        voucher.reward_detail = get_reward_detail(reward)
 
         voucher.save()
         self.message_user(
@@ -125,28 +130,13 @@ class VoucherAdmin(admin.ModelAdmin):
 
     # ── Admin Actions ─────────────────────────────────────────────────
     def approve_payment(self, request, queryset):
-        """Approve Paytm payments — activate voucher + assign random reward + generate QR"""
-        from .models import assign_random_reward, get_cashback_amount
+        """Approve payments — activate voucher + assign random reward + generate QR"""
+        from .models import assign_random_reward, get_reward_detail
         count = 0
         for voucher in queryset.filter(status='pending_payment'):
-            # Assign random reward
             reward = assign_random_reward()
-            voucher.reward_type = reward
-            if reward == 'cashback':
-                amount = get_cashback_amount()
-                voucher.reward_detail = f'₹{amount} Cashback'
-            elif reward == 'trip':
-                voucher.reward_detail = '500 Days Trip + Free Accommodation + Activities'
-            elif reward == 'wonderla':
-                voucher.reward_detail = 'Wonderla Theme Park Entry Ticket'
-            elif reward == 'gold':
-                voucher.reward_detail = 'Gold Gift (As per current rate)'
-            elif reward == 'silver':
-                voucher.reward_detail = 'Silver Gift (As per current rate)'
-            elif reward == 'boat_headset':
-                voucher.reward_detail = 'Premium Boat Headset'
-            elif reward == 'digital_watch':
-                voucher.reward_detail = 'Digital Watch'
+            voucher.reward_type   = reward
+            voucher.reward_detail = get_reward_detail(reward)
 
             voucher.status = 'active'
             voucher.save()

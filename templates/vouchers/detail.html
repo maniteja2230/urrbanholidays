@@ -131,24 +131,32 @@
                     <!-- ✅ GPay-Style Scratch Card -->
                     {% if voucher.reward_type %}
                     <div class="scratch-wrapper">
-                      <div class="scratch-title">🎉 Your Lucky Draw Reward!</div>
+                      <div class="scratch-title">🎊 You Won a Scratch Card!</div>
 
                       {% if voucher.reward_revealed %}
-                        <!-- Already revealed — show reward directly -->
+                        <!-- Already revealed — show reward -->
                         <div class="reward-revealed-box">
                           <div style="font-size:3.5rem;">
-                            {% if voucher.reward_type == 'cashback' %}💰
+                            {% if voucher.reward_type == 'off_100' %}💰
+                            {% elif voucher.reward_type == 'off_200' %}💰
+                            {% elif voucher.reward_type == 'off_500' %}💰
+                            {% elif voucher.reward_type == 'off_2000' %}💰
                             {% elif voucher.reward_type == 'wonderla' %}🎡
-                            {% elif voucher.reward_type == 'gold' %}🥇
+                            {% elif voucher.reward_type == 'accommodation' %}🏨
+                            {% elif voucher.reward_type == 'journey' %}🎫
                             {% elif voucher.reward_type == 'silver' %}🥈
-                            {% elif voucher.reward_type == 'trip' %}✈️
-                            {% elif voucher.reward_type == 'boat_headset' %}🎧
-                            {% elif voucher.reward_type == 'digital_watch' %}⌚
+                            {% elif voucher.reward_type == 'gold' %}🥇
                             {% endif %}
                           </div>
-                          <div style="color:#FFD700;font-weight:800;font-size:1.1rem;margin-top:6px;">You Won!</div>
-                          <div style="color:white;font-weight:700;font-size:1rem;">{{ voucher.reward_detail }}</div>
-                          <div style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-top:6px;">📞 Contact us to claim: support@urrbanholidays.in</div>
+                          {% if voucher.reward_type == 'gold' or voucher.reward_type == 'silver' %}
+                            <div style="background:linear-gradient(135deg,#FFD700,#FF6B00);color:#000;font-weight:900;font-size:1rem;padding:4px 16px;border-radius:20px;margin-top:8px;letter-spacing:1px;">
+                              🏆 LUCKY WINNER!
+                            </div>
+                          {% else %}
+                            <div style="color:#FFD700;font-weight:800;font-size:1.1rem;margin-top:6px;">🎉 You Won!</div>
+                          {% endif %}
+                          <div style="color:white;font-weight:700;font-size:1rem;margin-top:4px;">{{ voucher.reward_detail }}</div>
+                          <div style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-top:8px;">📧 Contact us to claim: support@urrbanholidays.in</div>
                         </div>
 
                       {% else %}
@@ -158,13 +166,15 @@
                         <div class="scratch-card-wrap">
                           <!-- Reward behind canvas -->
                           <div class="scratch-reward-bg">
-                            {% if voucher.reward_type == 'cashback' %}<div class="reward-icon-big">💰</div><div class="reward-name-big">CASHBACK WON!</div>
-                            {% elif voucher.reward_type == 'wonderla' %}<div class="reward-icon-big">🎡</div><div class="reward-name-big">WONDERLA TICKET!</div>
-                            {% elif voucher.reward_type == 'gold' %}<div class="reward-icon-big">🥇</div><div class="reward-name-big">GOLD GIFT!</div>
-                            {% elif voucher.reward_type == 'silver' %}<div class="reward-icon-big">🥈</div><div class="reward-name-big">SILVER GIFT!</div>
-                            {% elif voucher.reward_type == 'trip' %}<div class="reward-icon-big">✈️</div><div class="reward-name-big">FREE TRIP WON!</div>
-                            {% elif voucher.reward_type == 'boat_headset' %}<div class="reward-icon-big">🎧</div><div class="reward-name-big">BOAT HEADSET!</div>
-                            {% elif voucher.reward_type == 'digital_watch' %}<div class="reward-icon-big">⌚</div><div class="reward-name-big">DIGITAL WATCH!</div>
+                            {% if voucher.reward_type == 'off_100' %}<div class="reward-icon-big">💰</div><div class="reward-name-big">₹100 OFF!</div>
+                            {% elif voucher.reward_type == 'off_200' %}<div class="reward-icon-big">💰</div><div class="reward-name-big">₹200 OFF!</div>
+                            {% elif voucher.reward_type == 'off_500' %}<div class="reward-icon-big">💰</div><div class="reward-name-big">₹500 OFF!</div>
+                            {% elif voucher.reward_type == 'off_2000' %}<div class="reward-icon-big">💰</div><div class="reward-name-big">₹2000 OFF!</div>
+                            {% elif voucher.reward_type == 'wonderla' %}<div class="reward-icon-big">🎡</div><div class="reward-name-big">WONDERLA!</div>
+                            {% elif voucher.reward_type == 'accommodation' %}<div class="reward-icon-big">🏨</div><div class="reward-name-big">FREE STAY!</div>
+                            {% elif voucher.reward_type == 'journey' %}<div class="reward-icon-big">🎫</div><div class="reward-name-big">FREE JOURNEY!</div>
+                            {% elif voucher.reward_type == 'silver' %}<div class="reward-icon-big">🥈</div><div class="reward-name-big">10gm SILVER!</div>
+                            {% elif voucher.reward_type == 'gold' %}<div class="reward-icon-big">🥇</div><div class="reward-name-big">1gm GOLD!</div>
                             {% endif %}
                             <div class="reward-sub">{{ voucher.reward_detail }}</div>
                           </div>
