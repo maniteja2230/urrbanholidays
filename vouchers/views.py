@@ -1,13 +1,18 @@
+import json
+import hmac
+import hashlib
 import logging
+import razorpay
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 
-from .models import Voucher, Coupon, Redemption
+from .models import Voucher, Coupon, Redemption, assign_random_reward, get_reward_detail
 from .forms import RedemptionForm
 from .utils import generate_voucher_pdf
 from core.email_utils import (
@@ -20,70 +25,147 @@ from core.email_utils import (
 
 logger = logging.getLogger(__name__)
 
+# ── Razorpay client ─────────────────────────────────────────────────
+rz_client = razorpay.Client(
+    auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+)
+
+
 
 @login_required
 def buy_voucher(request):
     """
-    Paytm QR payment page.
-    Shows QR code + form to enter UTR/Transaction ID after paying.
+    Razorpay checkout page.
+    Shows the Razorpay payment button.
     """
     amount = settings.VOUCHER_PRICE  # 149
+    return render(request, 'vouchers/buy.html', {
+        'amount': amount,
+        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+    })
 
-    if request.method == 'POST':
-        utr = request.POST.get('utr_number', '').strip()
-        screenshot = request.FILES.get('payment_screenshot')
 
-        if not utr:
-            messages.error(request, 'Please enter your UPI Transaction ID / UTR number.')
-            return render(request, 'vouchers/buy.html', {'amount': amount})
+@login_required
+def create_order(request):
+    """POST: Create Razorpay order and return order_id"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-        # Check if UTR already used (prevent duplicates)
-        if Voucher.objects.filter(utr_number=utr).exists():
-            messages.error(request, 'This Transaction ID has already been submitted. Please contact support.')
-            return render(request, 'vouchers/buy.html', {'amount': amount})
+    amount_inr = settings.VOUCHER_PRICE          # 149
+    amount_paise = amount_inr * 100              # 14900 paise
 
-        # Create voucher in pending_payment status
-        voucher = Voucher.objects.create(
-            user=request.user,
-            amount=amount,
-            status='pending_payment',
-            utr_number=utr,
-            payment_method='paytm_qr',
-            expiry_date=timezone.now() + timedelta(days=settings.VOUCHER_VALIDITY_DAYS),
-        )
+    if amount_paise < 100:
+        return JsonResponse({'error': 'Amount too low'}, status=400)
 
-        # Save screenshot if uploaded
-        if screenshot:
-            voucher.payment_screenshot = screenshot
-            voucher.save()
+    try:
+        order = rz_client.order.create({
+            'amount':   amount_paise,
+            'currency': 'INR',
+            'receipt':  f'uh_{request.user.id}_{timezone.now().strftime("%Y%m%d%H%M%S")}',
+            'payment_capture': 1,
+        })
+        return JsonResponse({
+            'order_id': order['id'],
+            'amount':   order['amount'],
+            'currency': order['currency'],
+            'key_id':   settings.RAZORPAY_KEY_ID,
+        })
+    except razorpay.errors.BadRequestError as e:
+        logger.error(f'Razorpay BadRequest: {e}')
+        return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        logger.error(f'Razorpay order creation failed: {e}')
+        return JsonResponse({'error': 'Payment gateway error. Please try again.'}, status=500)
 
-        # Notify admins
-        try:
-            from notifications.models import Notification
-            from django.contrib.auth.models import User as AuthUser
-            for admin in AuthUser.objects.filter(is_staff=True):
-                Notification.objects.create(
-                    user=admin,
-                    title='💰 New Payment Verification Required',
-                    message=(
-                        f'User {request.user.username} paid ₹{amount} via Paytm. '
-                        f'UTR: {utr}. Voucher: {voucher.voucher_number}. '
-                        f'Please verify and activate in admin panel.'
-                    ),
-                    notification_type='voucher',
-                )
-        except Exception as e:
-            logger.warning(f"Admin notification failed: {e}")
 
-        # Send payment received email
-        try:
-            send_payment_received_email(voucher)
-        except Exception as e:
-            logger.warning(f"Payment email failed: {e}")
+@csrf_exempt
+@login_required
+def verify_payment(request):
+    """POST: Verify Razorpay payment signature and activate membership"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-        return redirect('vouchers:payment_pending', voucher_number=voucher.voucher_number)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
-    return render(request, 'vouchers/buy.html', {'amount': amount})
+    payment_id = data.get('razorpay_payment_id', '')
+    order_id   = data.get('razorpay_order_id', '')
+    signature  = data.get('razorpay_signature', '')
+
+    if not all([payment_id, order_id, signature]):
+        return JsonResponse({'error': 'Missing payment details'}, status=400)
+
+    # ── Verify HMAC-SHA256 signature ──────────────────────────────
+    msg        = f'{order_id}|{payment_id}'.encode()
+    secret     = settings.RAZORPAY_KEY_SECRET.encode()
+    gen_sig    = hmac.new(secret, msg, hashlib.sha256).hexdigest()
+
+    if not hmac.compare_digest(gen_sig, signature):
+        logger.warning(f'Razorpay signature mismatch for order {order_id}')
+        return JsonResponse({'error': 'Payment verification failed. Please contact support.'}, status=400)
+
+    # ── Signature valid — activate membership ─────────────────────
+    amount = settings.VOUCHER_PRICE
+
+    # Prevent duplicate activations for same order
+    if Voucher.objects.filter(razorpay_order_id=order_id).exists():
+        voucher = Voucher.objects.get(razorpay_order_id=order_id)
+        return JsonResponse({'success': True, 'voucher_number': voucher.voucher_number})
+
+    # Assign random scratch card reward
+    reward      = assign_random_reward()
+    reward_text = get_reward_detail(reward)
+
+    voucher = Voucher.objects.create(
+        user               = request.user,
+        amount             = amount,
+        status             = 'active',
+        payment_method     = 'razorpay',
+        razorpay_order_id  = order_id,
+        razorpay_payment_id= payment_id,
+        utr_number         = payment_id,   # store payment_id as reference
+        expiry_date        = timezone.now() + timedelta(days=settings.VOUCHER_VALIDITY_DAYS),
+        reward_type        = reward,
+        reward_detail      = reward_text,
+        reward_revealed    = False,
+    )
+
+    # Generate QR code
+    try:
+        from .utils import generate_qr_code
+        generate_qr_code(voucher)
+    except Exception as e:
+        logger.warning(f'QR generation failed: {e}')
+
+    # Notify admins
+    try:
+        from notifications.models import Notification
+        from django.contrib.auth.models import User as AuthUser
+        for admin in AuthUser.objects.filter(is_staff=True):
+            Notification.objects.create(
+                user=admin,
+                title='💰 New Razorpay Payment Received',
+                message=(
+                    f'User {request.user.username} paid ₹{amount} via Razorpay. '
+                    f'Payment ID: {payment_id}. Membership: {voucher.voucher_number}. '
+                    f'Auto-activated!'
+                ),
+                notification_type='voucher',
+            )
+    except Exception as e:
+        logger.warning(f'Admin notification failed: {e}')
+
+    # Send activation email
+    try:
+        send_membership_activated_email(voucher)
+    except Exception as e:
+        logger.warning(f'Activation email failed: {e}')
+
+    logger.info(f'Membership {voucher.voucher_number} activated via Razorpay for {request.user.username}')
+    return JsonResponse({'success': True, 'voucher_number': voucher.voucher_number})
+
 
 
 @login_required

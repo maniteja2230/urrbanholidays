@@ -5,259 +5,282 @@
 
 {% block extra_css %}
 <style>
-  body { background: linear-gradient(135deg, #0a1628 0%, #1a2f5e 50%, #0d1f3c 100%); min-height: 100vh; }
+:root {
+  --brand: #0A2463;
+  --gold:  #FFD700;
+  --grad:  linear-gradient(135deg, #0A2463 0%, #1565C0 100%);
+}
 
-  .buy-card {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,215,0,0.2);
-    border-radius: 20px;
-    overflow: hidden;
-  }
+.buy-hero {
+  background: var(--grad);
+  padding: 3.5rem 0 2rem;
+  text-align: center;
+  color: white;
+}
+.buy-hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: .4rem; }
+.buy-hero p  { opacity: .8; font-size: 1rem; }
 
-  .buy-header {
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    padding: 2rem;
-    text-align: center;
-  }
+/* ── Card ───────────────────────── */
+.checkout-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(10,36,99,.12);
+  overflow: hidden;
+  max-width: 460px;
+  margin: -40px auto 3rem;
+}
+.card-header-band {
+  background: var(--grad);
+  padding: 1.4rem 2rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.card-header-band .price-tag {
+  margin-left: auto;
+  background: var(--gold);
+  color: #0A2463;
+  font-size: 1.6rem; font-weight: 900;
+  border-radius: 12px; padding: .3rem 1rem;
+}
+.card-body-pad { padding: 1.8rem 2rem; }
 
-  .buy-header h2 { color: #0A2463; font-weight: 800; font-size: 1.8rem; margin: 0; }
-  .buy-header p  { color: #0A2463; margin: 0.3rem 0 0; font-size: 1rem; opacity: 0.85; }
+/* ── Benefits list ──────────────── */
+.benefit-row {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .6rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: .95rem; color: #333;
+}
+.benefit-row:last-child { border-bottom: none; }
+.benefit-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #EEF2FF;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
 
-  .price-badge {
-    background: #0A2463;
-    color: #FFD700;
-    font-size: 2.5rem;
-    font-weight: 900;
-    width: 110px; height: 110px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: -55px auto 1rem;
-    border: 5px solid #FFD700;
-    box-shadow: 0 8px 30px rgba(255,215,0,0.4);
-  }
+/* ── Pay button ─────────────────── */
+.pay-btn {
+  display: block; width: 100%;
+  background: linear-gradient(135deg, #43A047, #2E7D32);
+  color: white; font-size: 1.1rem; font-weight: 800;
+  border: none; border-radius: 14px;
+  padding: 1rem;
+  cursor: pointer;
+  letter-spacing: .5px;
+  box-shadow: 0 6px 20px rgba(46,125,50,.35);
+  transition: transform .2s, box-shadow .2s;
+  margin-top: 1.5rem;
+}
+.pay-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(46,125,50,.4); }
+.pay-btn:disabled { opacity: .6; cursor: not-allowed; }
 
-  .qr-box {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    border: 3px solid #FFD700;
-    max-width: 280px;
-    margin: 0 auto;
-  }
+/* ── Spinner ────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 3px solid rgba(255,255,255,.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  vertical-align: middle; margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  .qr-box img { width: 200px; height: 200px; object-fit: contain; }
-  .qr-label { font-weight: 700; color: #0A2463; margin-top: 0.5rem; font-size: 0.9rem; }
-  .upi-id { color: #1976D2; font-size: 0.8rem; font-weight: 600; }
+/* ── Secure badges ──────────────── */
+.badge-row {
+  display: flex; justify-content: center; gap: 1rem;
+  flex-wrap: wrap; margin-top: 1rem;
+}
+.secure-badge {
+  font-size: .72rem; color: #888;
+  display: flex; align-items: center; gap: .3rem;
+}
+.secure-badge i { color: #43A047; }
 
-  .steps { counter-reset: step-counter; }
-  .step-item {
-    display: flex; align-items: flex-start; gap: 1rem;
-    padding: 0.75rem; margin-bottom: 0.5rem;
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
-    color: rgba(255,255,255,0.9);
-    font-size: 0.9rem;
-  }
-  .step-num {
-    background: #FFD700; color: #0A2463;
-    font-weight: 800; font-size: 0.85rem;
-    width: 28px; height: 28px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .form-section { padding: 1.5rem 2rem 2rem; }
-  .form-label { color: rgba(255,255,255,0.85); font-weight: 600; font-size: 0.9rem; }
-  .form-control {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,215,0,0.3);
-    color: white; border-radius: 10px; padding: 0.75rem 1rem;
-    font-size: 1rem;
-  }
-  .form-control:focus {
-    background: rgba(255,255,255,0.15);
-    border-color: #FFD700;
-    color: white; box-shadow: 0 0 0 3px rgba(255,215,0,0.2);
-  }
-  .form-control::placeholder { color: rgba(255,255,255,0.4); }
-
-  .btn-submit {
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    color: #0A2463; font-weight: 800;
-    font-size: 1.1rem; border: none;
-    padding: 1rem 2rem; border-radius: 50px;
-    width: 100%; transition: all 0.3s;
-    box-shadow: 0 6px 25px rgba(255,215,0,0.35);
-  }
-  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 35px rgba(255,215,0,0.5); }
-
-  .benefits { padding: 0 2rem 1rem; }
-  .benefit-item {
-    display: flex; align-items: center; gap: 0.6rem;
-    color: rgba(255,255,255,0.8); font-size: 0.85rem; margin-bottom: 0.4rem;
-  }
-  .benefit-item i { color: #FFD700; }
-
-  .alert-info-custom {
-    background: rgba(255,215,0,0.1);
-    border: 1px solid rgba(255,215,0,0.3);
-    border-radius: 10px; padding: 0.75rem 1rem;
-    color: rgba(255,255,255,0.85); font-size: 0.85rem;
-  }
+/* ── Error box ──────────────────── */
+.pay-error {
+  background: #FFF3F3; border: 1px solid #FFCDD2;
+  border-radius: 10px; padding: .8rem 1rem;
+  color: #C62828; font-size: .88rem;
+  margin-top: 1rem; display: none;
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center g-4">
-
-    <!-- LEFT: QR + Steps -->
-    <div class="col-lg-5">
-      <div class="buy-card h-100">
-        <div class="buy-header">
-          <h2>🏆 Get Membership Plan</h2>
-          <p>Scan QR → Pay → Submit UTR → Activate!</p>
-        </div>
-
-        <div class="price-badge">₹{{ amount }}</div>
-
-        <div class="px-3 pb-2 text-center">
-          <div class="qr-box">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=9019852352@pthdfc%26pn=Urban%2520Holidays%26am=149%26tn=Urban%2520Holidays%2520Voucher%26cu=INR"
-                 alt="Paytm QR Code – Urban Holidays" style="width:200px;height:200px;">
-            <div class="qr-label">🔵 Scan with any UPI app</div>
-            <div class="upi-id" style="font-size:0.85rem; color:#1565C0; font-weight:700; margin-top:4px;">
-              9019852352@pthdfc
-            </div>
-            <div style="font-size:0.75rem; color:#888; margin-top:2px;">Urban Holidays ✅ Verified</div>
-            <div style="display:flex; justify-content:center; gap:6px; margin-top:10px; flex-wrap:wrap;">
-              <span style="background:#00BAF2; color:white; font-size:0.7rem; font-weight:700; padding:3px 8px; border-radius:20px;">Paytm</span>
-              <span style="background:#1A73E8; color:white; font-size:0.7rem; font-weight:700; padding:3px 8px; border-radius:20px;">GPay</span>
-              <span style="background:#5F259F; color:white; font-size:0.7rem; font-weight:700; padding:3px 8px; border-radius:20px;">PhonePe</span>
-              <span style="background:#FF6600; color:white; font-size:0.7rem; font-weight:700; padding:3px 8px; border-radius:20px;">BHIM</span>
-            </div>
-          </div>
-          <div class="mt-2 text-center">
-            <small style="color:rgba(255,255,255,0.6);">Or pay manually to UPI ID:</small><br>
-            <span style="color:#FFD700; font-weight:700; font-size:1rem; letter-spacing:0.5px;">9019852352@pthdfc</span>
-          </div>
-
-          <div class="mt-3 alert-info-custom">
-            <strong>⚠️ Pay exactly ₹{{ amount }}</strong><br>
-            Save your payment screenshot & note the <strong>Transaction ID / UTR</strong>
-          </div>
-        </div>
-
-        <!-- Steps -->
-        <div class="steps px-3 pb-3 mt-2">
-          <div class="step-item"><span class="step-num">1</span> Scan the QR code with your UPI app</div>
-          <div class="step-item"><span class="step-num">2</span> Pay exactly ₹{{ amount }}</div>
-          <div class="step-item"><span class="step-num">3</span> Copy the <strong>Transaction ID / UTR</strong> from your app</div>
-          <div class="step-item"><span class="step-num">4</span> Enter it in the form → Submit</div>
-          <div class="step-item"><span class="step-num">5</span> We verify &amp; activate your <strong>membership within 30 minutes</strong></div>
-        </div>
-
-        <!-- Benefits -->
-        <div class="benefits">
-          <div class="benefit-item"><i class="fas fa-check-circle"></i> 🏆 Membership valid for 365 days</div>
-          <div class="benefit-item"><i class="fas fa-check-circle"></i> 🎡 Lucky draw scratch card reward</div>
-          <div class="benefit-item"><i class="fas fa-check-circle"></i> ✈️ Free accommodation + activities</div>
-          <div class="benefit-item"><i class="fas fa-check-circle"></i> 👪 Transferable to family/friends</div>
-          <div class="benefit-item"><i class="fas fa-shield-alt"></i> 🔒 100% secure &amp; verified</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: UTR Form -->
-    <div class="col-lg-5">
-      <div class="buy-card">
-        <div class="buy-header">
-          <h2>📝 Activate Membership</h2>
-          <p>Enter Transaction ID to activate your membership</p>
-        </div>
-
-        <div class="form-section">
-          {% if messages %}
-            {% for msg in messages %}
-              <div class="alert alert-{{ msg.tags }} alert-dismissible fade show mb-3" role="alert">
-                {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-              </div>
-            {% endfor %}
-          {% endif %}
-
-          <form method="POST" enctype="multipart/form-data" id="paymentForm">
-            {% csrf_token %}
-
-            <!-- User Info (readonly) -->
-            <div class="mb-3">
-              <label class="form-label">👤 Name</label>
-              <input type="text" class="form-control" value="{{ request.user.get_full_name|default:request.user.username }}" readonly>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">📧 Email</label>
-              <input type="email" class="form-control" value="{{ request.user.email }}" readonly>
-            </div>
-
-            <!-- UTR Number -->
-            <div class="mb-3">
-              <label class="form-label">🔢 Transaction ID / UTR Number <span class="text-warning">*</span></label>
-              <input type="text" class="form-control" name="utr_number"
-                     placeholder="e.g. 426812345678 or T2406198XXXXX"
-                     required maxlength="50" id="utrInput">
-              <div class="form-text text-white-50 mt-1">
-                Find this in your UPI app → Payment History → Transaction details
-              </div>
-            </div>
-
-            <!-- Screenshot (optional) -->
-            <div class="mb-4">
-              <label class="form-label">📸 Payment Screenshot <span class="text-white-50">(optional but recommended)</span></label>
-              <input type="file" class="form-control" name="payment_screenshot"
-                     accept="image/*" id="screenshotInput">
-              <div class="form-text text-white-50 mt-1">Upload screenshot for faster verification</div>
-            </div>
-
-            <!-- Amount confirmation -->
-            <div class="alert-info-custom mb-4">
-              <div class="d-flex justify-content-between">
-                <span>Voucher Amount</span><strong>₹{{ amount }}</strong>
-              </div>
-              <div class="d-flex justify-content-between mt-1">
-                <span>Processing</span><strong>FREE</strong>
-              </div>
-              <hr style="border-color: rgba(255,215,0,0.2); margin: 0.5rem 0;">
-              <div class="d-flex justify-content-between">
-                <span><strong>Total Paid</strong></span><strong style="color:#FFD700">₹{{ amount }}</strong>
-              </div>
-            </div>
-
-            <button type="submit" class="btn btn-submit" id="submitBtn">
-              <i class="fas fa-paper-plane me-2"></i> Submit & Get My Voucher
-            </button>
-
-            <p class="text-center mt-3 text-white-50" style="font-size:0.8rem;">
-              ⏱️ Verification takes up to 30 minutes during business hours<br>
-              📞 Need help? Contact: support@urrbanholidays.in
-            </p>
-          </form>
-        </div>
-      </div>
-    </div>
-
+<!-- Hero -->
+<div class="buy-hero">
+  <div class="container">
+    <h1>🏆 Get Your Membership Plan</h1>
+    <p>Pay securely via UPI, Card, Netbanking or Wallet</p>
   </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
+<div class="container">
+  <div class="checkout-card">
+
+    <!-- Card Header -->
+    <div class="card-header-band">
+      <div>
+        <div style="color:rgba(255,255,255,.7);font-size:.75rem;letter-spacing:1px;">URBAN HOLIDAYS</div>
+        <div style="color:white;font-size:1.1rem;font-weight:800;">Membership Plan</div>
+      </div>
+      <div class="price-tag">₹{{ amount }}</div>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body-pad">
+
+      <!-- What you get -->
+      <p style="font-weight:700;color:#0A2463;margin-bottom:.8rem;">✨ What you get:</p>
+
+      <div class="benefit-row">
+        <div class="benefit-icon">🎊</div>
+        <div><strong>Lucky Draw Scratch Card</strong> – Win exciting rewards instantly!</div>
+      </div>
+      <div class="benefit-row">
+        <div class="benefit-icon">✈️</div>
+        <div><strong>Exclusive Travel Access</strong> – Premium packages across India</div>
+      </div>
+      <div class="benefit-row">
+        <div class="benefit-icon">🏨</div>
+        <div><strong>Free Accommodation</strong> – On eligible trips</div>
+      </div>
+      <div class="benefit-row">
+        <div class="benefit-icon">📅</div>
+        <div><strong>365 Days Valid</strong> – Use anytime within a year</div>
+      </div>
+      <div class="benefit-row">
+        <div class="benefit-icon">👨‍👩‍👧</div>
+        <div><strong>Transferable</strong> – Gift to family or friends</div>
+      </div>
+
+      <!-- Pay button -->
+      <button class="pay-btn" id="payBtn" onclick="startPayment()">
+        <i class="bi bi-shield-lock-fill me-2"></i>Pay ₹{{ amount }} Securely
+      </button>
+
+      <!-- Error message -->
+      <div class="pay-error" id="payError"></div>
+
+      <!-- Trust badges -->
+      <div class="badge-row">
+        <div class="secure-badge"><i class="bi bi-shield-check-fill"></i> 256-bit SSL</div>
+        <div class="secure-badge"><i class="bi bi-check-circle-fill"></i> Razorpay Secured</div>
+        <div class="secure-badge"><i class="bi bi-lock-fill"></i> 100% Safe</div>
+      </div>
+
+      <p class="text-center text-muted mt-3" style="font-size:.75rem;">
+        By paying you agree to our <a href="{% url 'core:terms' %}">Terms & Conditions</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Razorpay SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script>
-  document.getElementById('paymentForm').addEventListener('submit', function() {
-    const btn = document.getElementById('submitBtn');
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Submitting...';
-    btn.disabled = true;
+const CSRF_TOKEN   = '{{ csrf_token }}';
+const RZP_KEY      = '{{ razorpay_key_id }}';
+const USER_NAME    = '{{ request.user.get_full_name|default:request.user.username }}';
+const USER_EMAIL   = '{{ request.user.email }}';
+const CREATE_URL   = '{% url "vouchers:create_order" %}';
+const VERIFY_URL   = '{% url "vouchers:verify_payment" %}';
+const DASHBOARD_URL= '{% url "dashboard:my_vouchers" %}';
+
+function showError(msg) {
+  const el = document.getElementById('payError');
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'block';
+}
+
+function setLoading(on) {
+  const btn = document.getElementById('payBtn');
+  btn.disabled = on;
+  btn.innerHTML = on
+    ? '<span class="spinner"></span> Processing...'
+    : '<i class="bi bi-shield-lock-fill me-2"></i>Pay ₹{{ amount }} Securely';
+}
+
+async function startPayment() {
+  document.getElementById('payError').style.display = 'none';
+  setLoading(true);
+
+  // Step 1: Create Razorpay order
+  let orderData;
+  try {
+    const res = await fetch(CREATE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': CSRF_TOKEN,
+      },
+      body: JSON.stringify({}),
+    });
+    orderData = await res.json();
+    if (!res.ok) throw new Error(orderData.error || 'Order creation failed');
+  } catch (err) {
+    showError(err.message);
+    setLoading(false);
+    return;
+  }
+
+  // Step 2: Open Razorpay checkout modal
+  const options = {
+    key:         RZP_KEY,
+    amount:      orderData.amount,
+    currency:    orderData.currency,
+    order_id:    orderData.order_id,
+    name:        'Urban Holidays',
+    description: 'Membership Plan – ₹{{ amount }}',
+    image:       'https://urrbanholidays.in/static/images/logo.png',
+    prefill: {
+      name:  USER_NAME,
+      email: USER_EMAIL,
+    },
+    theme: { color: '#0A2463' },
+    modal: {
+      ondismiss: () => {
+        showError('Payment was cancelled. Click the button to try again.');
+        setLoading(false);
+      }
+    },
+    handler: async function(response) {
+      // Step 3: Verify payment on backend
+      try {
+        const vRes = await fetch(VERIFY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id:   response.razorpay_order_id,
+            razorpay_signature:  response.razorpay_signature,
+          }),
+        });
+        const vData = await vRes.json();
+        if (vData.success) {
+          // ✅ Payment verified — go to membership + scratch card!
+          window.location.href = '/vouchers/detail/' + vData.voucher_number + '/';
+        } else {
+          showError(vData.error || 'Verification failed. Please contact support.');
+          setLoading(false);
+        }
+      } catch (err) {
+        showError('Network error during verification. Please contact support@urrbanholidays.in');
+        setLoading(false);
+      }
+    },
+  };
+
+  // Handle payment failure inside modal
+  const rzp = new Razorpay(options);
+  rzp.on('payment.failed', function(response) {
+    showError('Payment failed: ' + (response.error.description || 'Unknown error'));
+    setLoading(false);
   });
+  rzp.open();
+  setLoading(false);
+}
 </script>
 {% endblock %}

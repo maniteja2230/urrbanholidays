@@ -126,6 +126,14 @@ class Voucher(models.Model):
         max_length=30, default='paytm_qr',
         help_text='paytm_qr / razorpay / manual'
     )
+    razorpay_order_id = models.CharField(
+        max_length=100, blank=True, default='',
+        help_text='Razorpay Order ID (order_xxxxx)'
+    )
+    razorpay_payment_id = models.CharField(
+        max_length=100, blank=True, default='',
+        help_text='Razorpay Payment ID (pay_xxxxx)'
+    )
 
     # Lucky Draw Reward
     reward_type = models.CharField(
