@@ -9,10 +9,10 @@ from django.conf import settings
 
 # ── Reward System ─────────────────────────────────────────────────
 REWARD_CHOICES = [
-    ('off_100',   '💰 Rs.100 Cash Back'),
-    ('off_200',   '💰 Rs.200 Cash Back'),
-    ('off_500',   '💰 Rs.500 Cash Back'),
-    ('off_2000',  '💰 Rs.2000 Cash Back'),
+    ('off_100',   '💰 Rs.100 Off on Your Next Trip'),
+    ('off_200',   '💰 Rs.200 Off on Your Next Trip'),
+    ('off_500',   '💰 Rs.500 Off on Your Next Trip'),
+    ('off_2000',  '💰 Rs.2000 Off on Your Next Trip'),
     ('wonderla',  '🎡 Wonderla Theme Park Tickets'),
     ('shirdi',    '🛕 Shirdi to Shirdi Trip'),
     ('kashi',     '🙏 Kashi Ayodhya Trip'),
@@ -50,10 +50,10 @@ def is_lucky_winner(reward_type):
 def get_reward_detail(reward_type):
     """Return the display text for a given reward type"""
     details = {
-        'off_100':  'Rs.100 Cash Back on Your Next Trip',
-        'off_200':  'Rs.200 Cash Back on Your Next Trip',
-        'off_500':  'Rs.500 Cash Back on Your Next Trip',
-        'off_2000': 'Rs.2000 Cash Back on Your Next Trip',
+        'off_100':  'Rs.100 Off on Your Next Trip',
+        'off_200':  'Rs.200 Off on Your Next Trip',
+        'off_500':  'Rs.500 Off on Your Next Trip',
+        'off_2000': 'Rs.2000 Off on Your Next Trip',
         'wonderla': 'Wonderla Theme Park Entry Tickets',
         'shirdi':   'Shirdi to Shirdi Trip (Complimentary)',
         'kashi':    'Kashi Ayodhya Trip (Complimentary)',
