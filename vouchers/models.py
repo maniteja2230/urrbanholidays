@@ -9,32 +9,31 @@ from django.conf import settings
 
 # ── Reward System ─────────────────────────────────────────────────
 REWARD_CHOICES = [
-    ('off_100',         '💰 ₹100 Off on Your Next Trip'),
-    ('off_200',         '💰 ₹200 Off on Your Next Trip'),
-    ('off_500',         '💰 ₹500 Off on Your Next Trip'),
-    ('off_2000',        '💰 ₹2000 Off on Your Next Trip'),
-    ('wonderla',        '🎡 Wonderla Tickets'),
-    ('accommodation',   '🏨 Accommodation Free on Your Next Trip'),
-    ('journey',         '🎫 Journey Tickets Free on Your Next Trip'),
-    ('silver',          '🥈 You Got 10gm of Silver'),
-    ('gold',            '🥇 You Won 1 Gram Gold'),
+    ('off_100',   '💰 Rs.100 Cash Back'),
+    ('off_200',   '💰 Rs.200 Cash Back'),
+    ('off_500',   '💰 Rs.500 Cash Back'),
+    ('off_2000',  '💰 Rs.2000 Cash Back'),
+    ('wonderla',  '🎡 Wonderla Theme Park Tickets'),
+    ('shirdi',    '🛕 Shirdi to Shirdi Trip'),
+    ('kashi',     '🙏 Kashi Ayodhya Trip'),
+    ('silver',    '🥈 You Got 10gm of Silver'),
 ]
 
-# Weighted probability (matches user-defined %)
+# Weighted probability based on number of people:
+# 100cb→200, 200cb→50, Wonderla→10, Shirdi→10, Kashi→10, 500cb→5, 2000cb→5, Silver→1 | Total=291
 REWARD_WEIGHTS = {
-    'off_100':        19,
-    'off_200':        10,
-    'off_500':        40,   # Most common
-    'off_2000':        5,
-    'wonderla':       10,
-    'accommodation':  10,
-    'journey':         5,
-    'silver':          1,   # Lucky Winner
-    'gold':            1,   # Lucky Winner
+    'off_100':  69,   # 200 people → ~69%
+    'off_200':  17,   # 50 people  → ~17%
+    'wonderla':  3,   # 10 people  → ~3%
+    'shirdi':    3,   # 10 people  → ~3%
+    'kashi':     3,   # 10 people  → ~3%
+    'off_500':   2,   # 5 people   → ~2%
+    'off_2000':  2,   # 5 people   → ~2%
+    'silver':    1,   # 1 person   → ~1% (Lucky Winner)
 }
 
-# Rewards that show "Lucky Winner" label
-LUCKY_WINNER_REWARDS = {'silver', 'gold'}
+# Rewards that show "Lucky Winner" banner
+LUCKY_WINNER_REWARDS = {'silver'}
 
 
 def assign_random_reward():
@@ -52,15 +51,14 @@ def is_lucky_winner(reward_type):
 def get_reward_detail(reward_type):
     """Return the display text for a given reward type"""
     details = {
-        'off_100':       '₹100 Off on Your Next Trip',
-        'off_200':       '₹200 Off on Your Next Trip',
-        'off_500':       '₹500 Off on Your Next Trip',
-        'off_2000':      '₹2000 Off on Your Next Trip',
-        'wonderla':      'Wonderla Theme Park Entry Ticket',
-        'accommodation': 'Accommodation Free on Your Next Trip',
-        'journey':       'Journey Tickets Free on Your Next Trip',
-        'silver':        'You Got 10gm of Silver 🥈',
-        'gold':          'You Won 1 Gram Gold 🥇',
+        'off_100':  'Rs.100 Cash Back on Your Next Trip',
+        'off_200':  'Rs.200 Cash Back on Your Next Trip',
+        'off_500':  'Rs.500 Cash Back on Your Next Trip',
+        'off_2000': 'Rs.2000 Cash Back on Your Next Trip',
+        'wonderla': 'Wonderla Theme Park Entry Tickets',
+        'shirdi':   'Shirdi to Shirdi Trip (Complimentary)',
+        'kashi':    'Kashi Ayodhya Trip (Complimentary)',
+        'silver':   'You Got 10gm of Silver ⚡ Lucky Winner!',
     }
     return details.get(reward_type, 'Special Reward')
 
