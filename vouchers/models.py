@@ -19,17 +19,16 @@ REWARD_CHOICES = [
     ('silver',    '🥈 You Got 10gm of Silver'),
 ]
 
-# Weighted probability based on number of people:
-# 100cb→200, 200cb→50, Wonderla→10, Shirdi→10, Kashi→10, 500cb→5, 2000cb→5, Silver→1 | Total=291
+# Weighted probability based on user-defined percentages
 REWARD_WEIGHTS = {
-    'off_100':  69,   # 200 people → ~69%
-    'off_200':  17,   # 50 people  → ~17%
-    'wonderla':  3,   # 10 people  → ~3%
-    'shirdi':    3,   # 10 people  → ~3%
-    'kashi':     3,   # 10 people  → ~3%
-    'off_500':   2,   # 5 people   → ~2%
-    'off_2000':  2,   # 5 people   → ~2%
-    'silver':    1,   # 1 person   → ~1% (Lucky Winner)
+    'off_500':   75,  # Rs.500 Cash Back     → 75% (most common)
+    'off_100':    5,  # Rs.100 Cash Back     → 5%
+    'off_200':    5,  # Rs.200 Cash Back     → 5%
+    'wonderla':   2,  # Wonderla Tickets     → 2%
+    'shirdi':     2,  # Shirdi Trip          → 2%
+    'kashi':      2,  # Kashi Ayodhya Trip   → 2%
+    'off_2000':   2,  # Rs.2000 Cash Back    → 2%
+    'silver':     1,  # Silver (Lucky Win!)  → 1%
 }
 
 # Rewards that show "Lucky Winner" banner
