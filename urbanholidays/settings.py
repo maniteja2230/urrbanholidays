@@ -186,7 +186,8 @@ SITE_NAME             = config('SITE_NAME',             default='Urban Holidays'
 SITE_URL              = config('SITE_URL',              default='https://yoursite.railway.app')
 VOUCHER_PRICE         = config('VOUCHER_PRICE',         default=149,  cast=int)
 VOUCHER_VALIDITY_DAYS = config('VOUCHER_VALIDITY_DAYS', default=365,  cast=int)
-REFERRAL_BONUS        = config('REFERRAL_BONUS',        default=50,   cast=int)
+REFERRAL_BONUS        = config('REFERRAL_BONUS',        default=20,   cast=int)
+JOINING_BONUS         = config('JOINING_BONUS',         default=20,   cast=int)
 
 # ── Session ───────────────────────────────────────────────────────────────
 SESSION_COOKIE_AGE         = 86400 * 30   # 30 days

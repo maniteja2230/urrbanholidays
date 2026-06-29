@@ -9,30 +9,23 @@ from django.conf import settings
 
 # ── Reward System ─────────────────────────────────────────────────
 REWARD_CHOICES = [
-    ('off_100',   '💰 Rs.100 Off on Your Next Trip'),
-    ('off_200',   '💰 Rs.200 Off on Your Next Trip'),
-    ('off_500',   '💰 Rs.500 Off on Your Next Trip'),
-    ('off_2000',  '💰 Rs.2000 Off on Your Next Trip'),
-    ('wonderla',  '🎡 Wonderla Theme Park Tickets'),
-    ('shirdi',    '🛕 Shirdi to Shirdi Trip'),
-    ('kashi',     '🙏 Kashi Ayodhya Trip'),
-    ('silver',    '🥈 You Got 10gm of Silver'),
+    ('cashback_50',  '🎁 You Won a Cashback Voucher of Rs.50'),
+    ('cashback_100', '🎁 You Won a Cashback Voucher of Rs.100'),
+    ('cashback_500', '🎁 You Won a Cashback Voucher of Rs.500'),
+    ('off_500',      '💰 Rs.500 Off on Your Next Trip'),
 ]
 
-# Weighted probability based on user-defined percentages
+# Weighted probability
+# cashback_100 → 50%, cashback_50 → 20%, off_500 → 28%, cashback_500 → 2%
 REWARD_WEIGHTS = {
-    'off_500':   75,  # Rs.500 Cash Back     → 75% (most common)
-    'off_100':    5,  # Rs.100 Cash Back     → 5%
-    'off_200':    5,  # Rs.200 Cash Back     → 5%
-    'wonderla':   2,  # Wonderla Tickets     → 2%
-    'shirdi':     2,  # Shirdi Trip          → 2%
-    'kashi':      2,  # Kashi Ayodhya Trip   → 2%
-    'off_2000':   2,  # Rs.2000 Cash Back    → 2%
-    'silver':     1,  # Silver (Lucky Win!)  → 1%
+    'cashback_100': 50,   # You Won a Cashback Voucher of Rs.100 → 50%
+    'cashback_50':  20,   # You Won a Cashback Voucher of Rs.50  → 20%
+    'off_500':      28,   # Rs.500 Off on Your Next Trip          → 28%
+    'cashback_500':  2,   # You Won a Cashback Voucher of Rs.500  → 2%
 }
 
 # Rewards that show "Lucky Winner" banner
-LUCKY_WINNER_REWARDS = {'silver'}
+LUCKY_WINNER_REWARDS = {'cashback_500'}
 
 
 def assign_random_reward():
@@ -50,14 +43,10 @@ def is_lucky_winner(reward_type):
 def get_reward_detail(reward_type):
     """Return the display text for a given reward type"""
     details = {
-        'off_100':  'Rs.100 Off on Your Next Trip',
-        'off_200':  'Rs.200 Off on Your Next Trip',
-        'off_500':  'Rs.500 Off on Your Next Trip',
-        'off_2000': 'Rs.2000 Off on Your Next Trip',
-        'wonderla': 'Wonderla Theme Park Entry Tickets',
-        'shirdi':   'Shirdi to Shirdi Trip (Complimentary)',
-        'kashi':    'Kashi Ayodhya Trip (Complimentary)',
-        'silver':   'You Got 10gm of Silver ⚡ Lucky Winner!',
+        'cashback_50':  'You Won a Cashback Voucher of Rs.50',
+        'cashback_100': 'You Won a Cashback Voucher of Rs.100',
+        'cashback_500': 'You Won a Cashback Voucher of Rs.500',
+        'off_500':      'Rs.500 Off on Your Next Trip',
     }
     return details.get(reward_type, 'Special Reward')
 

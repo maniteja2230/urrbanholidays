@@ -139,6 +139,24 @@ def verify_payment(request):
     except Exception as e:
         logger.warning(f'QR generation failed: {e}')
 
+    # ── Credit Rs.20 joining bonus to wallet ──────────────────────
+    try:
+        from accounts.models import Profile
+        profile = Profile.objects.get(user=request.user)
+        joining_bonus = getattr(settings, 'JOINING_BONUS', 20)
+        profile.wallet_balance += joining_bonus
+        profile.save(update_fields=['wallet_balance'])
+        # Notify user of joining bonus
+        from notifications.models import Notification
+        Notification.objects.create(
+            user=request.user,
+            title='🎉 Welcome Bonus Credited!',
+            message=f'Rs.{joining_bonus} joining bonus has been added to your wallet. Welcome to Urban Holidays!',
+            notification_type='wallet',
+        )
+    except Exception as e:
+        logger.warning(f'Joining bonus credit failed: {e}')
+
     # Notify admins
     try:
         from notifications.models import Notification
