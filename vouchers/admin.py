@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
+from django.http import HttpResponse
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from .models import Voucher, Coupon, Redemption
 from core.email_utils import (
     send_membership_activated_email,
@@ -29,7 +32,7 @@ class VoucherAdmin(admin.ModelAdmin):
         'created_at', 'screenshot_preview'
     ]
     inlines = [CouponInline]
-    actions = ['approve_payment', 'reject_payment', 'generate_qr_codes', 'mark_expired', 'test_scratch_card']
+    actions = ['approve_payment', 'reject_payment', 'generate_qr_codes', 'mark_expired', 'test_scratch_card', 'export_to_excel']
 
     fieldsets = (
         ('Voucher Info', {
@@ -127,6 +130,93 @@ class VoucherAdmin(admin.ModelAdmin):
             f'/vouchers/detail/{voucher.voucher_number}/'
         )
     test_scratch_card.short_description = '🎮 Test Scratch Card (assign random reward)'
+
+    # ── EXPORT TO EXCEL ───────────────────────────────────────────────
+    def export_to_excel(self, request, queryset):
+        """Export selected vouchers to Excel with full user + voucher details"""
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = 'Urban Holidays Members'
+
+        # Styles
+        header_font  = Font(name='Calibri', bold=True, color='FFFFFF', size=11)
+        header_fill  = PatternFill('solid', fgColor='0A2463')
+        header_align = Alignment(horizontal='center', vertical='center', wrap_text=True)
+        data_align   = Alignment(horizontal='left', vertical='center')
+        thin         = Side(style='thin', color='CCCCCC')
+        border       = Border(left=thin, right=thin, top=thin, bottom=thin)
+        alt_fill     = PatternFill('solid', fgColor='EEF2FF')
+
+        # Headers
+        headers = [
+            '#', 'Full Name', 'Username', 'Email', 'Phone',
+            'Voucher Number', 'Reward Won', 'Payment ID',
+            'Amount (Rs.)', 'Status', 'Purchase Date', 'Expiry Date'
+        ]
+        col_widths = [5, 20, 15, 28, 14, 20, 35, 28, 12, 12, 18, 18]
+
+        for col_num, (header, width) in enumerate(zip(headers, col_widths), 1):
+            cell = ws.cell(row=1, column=col_num, value=header)
+            cell.font      = header_font
+            cell.fill      = header_fill
+            cell.alignment = header_align
+            cell.border    = border
+            ws.column_dimensions[
+                openpyxl.utils.get_column_letter(col_num)
+            ].width = width
+        ws.row_dimensions[1].height = 30
+
+        # Data rows
+        for row_num, voucher in enumerate(queryset.select_related('user', 'user__profile'), 1):
+            user    = voucher.user
+            profile = getattr(user, 'profile', None)
+            phone   = getattr(profile, 'phone', '') or ''
+            full_name = user.get_full_name() or user.username
+            reward  = voucher.reward_detail or voucher.reward_type or 'Not Assigned'
+            row_fill = alt_fill if row_num % 2 == 0 else None
+
+            row_data = [
+                row_num,
+                full_name,
+                user.username,
+                user.email,
+                phone,
+                voucher.voucher_number,
+                reward,
+                voucher.razorpay_payment_id or voucher.utr_number or '',
+                float(voucher.amount),
+                voucher.get_status_display(),
+                voucher.purchase_date.strftime('%d-%m-%Y %H:%M') if voucher.purchase_date else '',
+                voucher.expiry_date.strftime('%d-%m-%Y') if voucher.expiry_date else '',
+            ]
+
+            for col_num, value in enumerate(row_data, 1):
+                cell = ws.cell(row=row_num + 1, column=col_num, value=value)
+                cell.alignment = data_align
+                cell.border    = border
+                if row_fill:
+                    cell.fill = row_fill
+
+        # Auto-filter
+        ws.auto_filter.ref = ws.dimensions
+        ws.freeze_panes    = 'A2'
+
+        # Summary row at bottom
+        total_row = len(queryset) + 2
+        ws.cell(row=total_row, column=1, value='TOTAL').font = Font(bold=True)
+        ws.cell(row=total_row, column=9, value=sum(
+            float(v.amount) for v in queryset
+        )).font = Font(bold=True)
+
+        # HTTP response
+        filename = f'UrbanHolidays_Members_{timezone.now().strftime("%d%m%Y_%H%M")}.xlsx'
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        wb.save(response)
+        return response
+    export_to_excel.short_description = '📊 Export to Excel (Member Report)'
 
     # ── Admin Actions ─────────────────────────────────────────────────
     def approve_payment(self, request, queryset):
